@@ -1,0 +1,31 @@
+// preload.js
+const { contextBridge, ipcRenderer } = require('electron')
+
+contextBridge.exposeInMainWorld('electron', {
+  ipcRenderer: {
+    invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
+    send: (channel, ...args) => ipcRenderer.send(channel, ...args)
+  },
+  api: {
+    insertRecords: async (readingData) => {
+      return ipcRenderer.invoke('insert-records', readingData)
+    },
+    editRecords: async (readingData) => {
+      return ipcRenderer.invoke('edit-records', readingData)
+    },
+    deleteRecords: async (readingData) => {
+      return ipcRenderer.invoke('delete-record', readingData)
+    }
+  },
+  auth: {
+    login: (password) => {
+      return ipcRenderer.invoke('auth:login', password)
+    },
+    logout: () => {
+      return ipcRenderer.invoke('auth:logout')
+    },
+    getRole: () => {
+      return ipcRenderer.invoke('auth:getRole')
+    }
+  }
+})

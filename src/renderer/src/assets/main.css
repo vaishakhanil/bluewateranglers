@@ -1,0 +1,49 @@
+@import './base.css';
+
+body {
+  /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: center; */
+  /* overflow: hidden; */
+  background-size: cover;
+  user-select: none;
+}
+
+#header-component {
+  width: 100vw;
+  height: 200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30%;
+}
+
+.header-logo-container > img,
+.header-logo-container > h1 {
+  padding: 20px;
+  font-weight: bold;
+  font-size: 2rem;
+  color: var(--ba-text-white);
+}
+
+.header-logo-container > h1 {
+  width: 30%;
+}
+
+/* MEDIUM SCREENS */
+@media (max-width: 720px) {
+}
+
+/* SMALL SCREENS */
+@media (max-width: 620px) {
+}
+
+/* MOBILE SMALL SCREENS */
+@media (max-width: 350px) {
+}
