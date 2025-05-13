@@ -7,14 +7,24 @@ export const FormField = ({
   type = 'text',
   name = '',
   value = '',
+  disabled = false,
   onChange = () => {}
 }) => {
+  const isCheckbox = type === 'checkbox'
+
   return (
-    <div>
+    <div className="form-field-container">
       <Labels htmlFor={name} invalid={invalid}>
         {label}
       </Labels>
-      <Input id={name} name={name} value={value} type={type} onChange={onChange} />
+      <Input
+        disabled={disabled}
+        id={name}
+        name={name}
+        type={type}
+        onChange={onChange}
+        {...(isCheckbox ? { checked: value } : { value })}
+      />
     </div>
   )
 }
@@ -24,6 +34,7 @@ FormField.propTypes = {
   label: PropTypes.string,
   type: PropTypes.string,
   name: PropTypes.string,
-  value: PropTypes.string,
+  disabled: PropTypes.bool,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   onChange: PropTypes.func
 }

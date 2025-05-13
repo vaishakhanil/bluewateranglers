@@ -16,7 +16,7 @@ export const Header = ({ displayMenus = true, displayReportMenu = false, isAdmin
 
       {displayMenus && (
         <div className="header-menu">
-          <Button onClick={() => navigate('/login')} variant={'regular'}>
+          <Button onClick={() => navigate('/addRecords')} variant={'regular'}>
             ADD / UPDATE DAILY REPORTS
           </Button>
           {isAdmin && (

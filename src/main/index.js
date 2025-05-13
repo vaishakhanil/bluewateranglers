@@ -3,8 +3,16 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initializeDatabase } from './database/initializeDatabase'
-import { insertRecords, editRecords, deleteRecords } from './database/CRUD'
+import {
+  insertRecords,
+  editRecords,
+  deleteRecords,
+  getPaginatedReadings,
+  getDataUsingDate
+} from './database/CRUD'
 import { ipcHandleAuth } from './auth/auth'
+import { setRole } from './auth/store'
+import { exportToExcel } from './generateReport/generateReport'
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -72,6 +80,19 @@ function handleIPC() {
       throw error
     }
   })
+
+  // Get Paginated Data
+  ipcMain.handle('get-plant-readings', async (event, page = 1) => {
+    const data = await getPaginatedReadings(page)
+    return { plant_readings: data }
+  })
+
+  // Generate Report from database
+  ipcMain.handle('generate-excel', async (event, dates) => {
+    const { start, end } = dates
+    const readings = getDataUsingDate(start, end)
+    await exportToExcel(readings, start, end)
+  })
 }
 
 app.whenReady().then(() => {
@@ -99,6 +120,7 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
+  setRole('guest')
   if (process.platform !== 'darwin') {
     app.quit()
   }

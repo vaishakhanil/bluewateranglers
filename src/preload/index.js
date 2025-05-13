@@ -15,6 +15,12 @@ contextBridge.exposeInMainWorld('electron', {
     },
     deleteRecords: async (readingData) => {
       return ipcRenderer.invoke('delete-record', readingData)
+    },
+    getPlantReadings: async (page) => {
+      return ipcRenderer.invoke('get-plant-readings', page)
+    },
+    generateExcel: async (dates) => {
+      return ipcRenderer.invoke('generate-excel', dates)
     }
   },
   auth: {

@@ -36,6 +36,37 @@ body {
   width: 30%;
 }
 
+.loader-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  overflow: hidden;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader-contents {
+  width: 400px;
+  height: 400px;
+  border-radius: 20px;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.loader-container h2 {
+  font-weight: bold;
+}
+
+.form-field-container {
+  margin: 5px;
+}
+
 /* MEDIUM SCREENS */
 @media (max-width: 720px) {
 }
