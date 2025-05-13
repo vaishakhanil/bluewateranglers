@@ -1,6 +1,6 @@
 import { db } from '../initializeDatabase'
 
-export const getPaginatedReadings = (page = 1, pageSize = 20) => {
+export const getPaginatedReadings = (page = 1, pageSize = 5) => {
   const offset = (page - 1) * pageSize
 
   // 1. Get the plant_readings (paginated)

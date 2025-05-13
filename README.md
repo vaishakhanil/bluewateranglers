@@ -8,9 +8,11 @@
 4.  Setup the Display of the table after reading the database - done
 5.  Setup the admin Edit part
 6.  Search Feature
-7.  Feature to save as excel and open in excel
-8.  Generate Reports
+7.  Feature to save as excel and open in excel - done
+8.  Generate Reports - done
 9.  Load all 800 records and tables
+
+TODO: 1. FIX THE TABLE & TANK 2. FIX THE EDIT & SAVE 3. SEARCH FEATURE 4. PYTHON BACKUPS
 
     {/\*
     DATE
@@ -140,3 +142,14 @@
 
 // const thStyle = { border: '1px solid #ddd', padding: '8px', background: '#f4f4f4' }
 // const tdStyle = { border: '1px solid #ddd', padding: '8px', verticalAlign: 'top' }
+
+            {snapshots.map((snap) => {
+              return (
+                <div key={snap.snapshot_id}>
+                  <h1>{snap.tank_name}</h1>
+                  <h1>{snap.clean}</h1>
+                  <h1>{snap.diet}</h1>
+                  <h1>{snap.diet_type}</h1>
+                </div>
+              )
+            })}

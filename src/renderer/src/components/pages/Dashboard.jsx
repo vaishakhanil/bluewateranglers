@@ -6,6 +6,7 @@ import { Loader } from '../organisms/Loader/Loader'
 
 import { Tabs, TabList, Tab, TabPanel } from 'react-tabs'
 import 'react-tabs/style/react-tabs.css'
+import TankSnapshotViewer from './TankSnapshots'
 
 export const Dashboard = () => {
   const navigate = useNavigate()
@@ -13,6 +14,7 @@ export const Dashboard = () => {
   const [loader, setLoader] = useState(false)
   const [page, setPage] = useState(1)
   const [plantReadings, setPlantReadings] = useState([])
+  const [snapshots, setSnapshots] = useState([])
 
   useEffect(() => {
     fetchUserRole()
@@ -25,9 +27,19 @@ export const Dashboard = () => {
 
   const getData = async () => {
     const data = await window.electron.api.getPlantReadings(page)
-    console.log(data)
+    let tankSanpshots = []
     if (data['plant_readings']) {
       setPlantReadings(data['plant_readings'])
+      data['plant_readings'].map((readings) => {
+        if (readings['tank_snapshots']) {
+          readings['tank_snapshots'].map((snapshot) => {
+            snapshot.timestamp = readings.timestamp
+            tankSanpshots.push(snapshot)
+          })
+        }
+      })
+
+      setSnapshots(tankSanpshots)
     }
   }
 
@@ -50,6 +62,8 @@ export const Dashboard = () => {
     }
   }
 
+  const renderTanks = () => {}
+
   const handleNext = () => setPage((p) => p + 1)
   const handlePrev = () => setPage((p) => Math.max(1, p - 1))
 
@@ -59,126 +73,223 @@ export const Dashboard = () => {
       <Header isAdmin={isAdmin} />
 
       {/* 
-          DISPLAY THE DATA
+         RENDER THE DATA
       */}
-      {/* {renderData()} */}
 
-      <Tabs>
-        <TabList>
-          <Tab>Base Area</Tab>
-          <Tab>Aeration System</Tab>
-          <Tab>Generator Area</Tab>
-          <Tab>Tanks</Tab>
-        </TabList>
+      <div className="tab-container">
+        <Tabs className={'tab-custom'}>
+          <TabList>
+            <Tab>Base Area</Tab>
+            <Tab>Aeration System</Tab>
+            <Tab>Generator Area</Tab>
+            <Tab>Tanks</Tab>
+          </TabList>
 
-        {/* BA Tab */}
-        <TabPanel>
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Header Pressure</th>
-                <th>Pump 1</th>
-                <th>Pump 2</th>
-                <th>Pump 3</th>
-                <th>Pump 4</th>
-                <th>East Pump North</th>
-                <th>East Well Pressure</th>
-                <th>Water Temp</th>
-                <th>Alarm</th>
-                {isAdmin && <th>Action</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {plantReadings.map((reading) => (
-                <tr key={reading.id}>
-                  <td>{new Date(reading.timestamp).toLocaleDateString('en-GB')}</td>
-                  <td>{reading.header_pressure_in}</td>
-                  <td>{reading.pump_1_active ? 'Active' : 'Inactive'}</td>
-                  <td>{reading.pump_2_active ? 'Active' : 'Inactive'}</td>
-                  <td>{reading.pump_3_active ? 'Active' : 'Inactive'}</td>
-                  <td>{reading.pump_4_active ? 'Active' : 'Inactive'}</td>
-                  <td>{reading.east_pump_active ? 'Active' : 'Inactive'}</td>
-                  <td>{reading.east_well_pressure}</td>
-                  <td>{reading.water_temperature}</td>
-                  <td>{reading.alarm_activated ? 'Yes' : 'No'}</td>
-                  {isAdmin && (
-                    <td>
-                      <button>edit</button>
+          {/* BA Tab */}
+          <TabPanel>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Header Pressure</th>
+                  <th>Pump 1</th>
+                  <th>Pump 2</th>
+                  <th>Pump 3</th>
+                  <th>Pump 4</th>
+                  <th>East Pump North</th>
+                  <th>East Well Pressure</th>
+                  <th>Water Temperature</th>
+                  <th>Alarm</th>
+                  {isAdmin && <th>Action</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {plantReadings.map((reading) => (
+                  <tr key={reading.id}>
+                    <td>{new Date(reading.timestamp).toLocaleDateString('en-GB')}</td>
+                    <td>{reading.header_pressure_in}</td>
+                    <td
+                      className={
+                        reading.pump_1_active ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.pump_1_active ? 'ON' : 'OFF'}
                     </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </TabPanel>
+                    <td
+                      className={
+                        reading.pump_2_active ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.pump_2_active ? 'ON' : 'OFF'}
+                    </td>
+                    <td
+                      className={
+                        reading.pump_3_active ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.pump_3_active ? 'ON' : 'OFF'}
+                    </td>
+                    <td
+                      className={
+                        reading.pump_4_active ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.pump_4_active ? 'ON' : 'OFF'}
+                    </td>
+                    <td
+                      className={
+                        reading.east_pump_active ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.east_pump_active ? 'ON' : 'OFF'}
+                    </td>
+                    <td>{reading.east_well_pressure}</td>
+                    <td>{Number(reading.water_temperature).toFixed(1)}</td>
+                    <td
+                      className={
+                        reading.alarm_activated ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.alarm_activated ? 'Yes' : 'No'}
+                    </td>
+                    {isAdmin && (
+                      <td>
+                        <button>edit</button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TabPanel>
 
-        {/* AS Tab */}
-        <TabPanel>
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>East Blower North</th>
-                <th>East Blower South</th>
-                <th>West Blower</th>
-                <th>East Blower Pressure</th>
-                <th>West Blower Pressure</th>
-                <th>Overflow</th>
-              </tr>
-            </thead>
-            <tbody>
-              {plantReadings.map((reading) => (
-                <tr key={reading.id}>
-                  <td>{new Date(reading.timestamp).toLocaleDateString('en-GB')}</td>
-                  <td>{reading.east_blower_north_active ? 'Active' : 'Inactive'}</td>
-                  <td>{reading.east_blower_south_active ? 'Active' : 'Inactive'}</td>
-                  <td>{reading.west_blower_active ? 'Active' : 'Inactive'}</td>
-                  <td>{reading.east_blower_header_pressure}</td>
-                  <td>{reading.west_blower_header_pressure}</td>
-                  <td>{reading.aeration_tank_overflow ? 'Yes' : 'No'}</td>
+          {/* AS Tab */}
+          <TabPanel>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>East Blower North</th>
+                  <th>East Blower South</th>
+                  <th>West Blower</th>
+                  <th>East Blower Pressure</th>
+                  <th>West Blower Pressure</th>
+                  <th>Overflow</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </TabPanel>
+              </thead>
+              <tbody>
+                {plantReadings.map((reading) => (
+                  <tr key={reading.id}>
+                    <td>{new Date(reading.timestamp).toLocaleDateString('en-GB')}</td>
+                    <td
+                      className={
+                        reading.east_blower_north_active
+                          ? 'active-table-cell'
+                          : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.east_blower_north_active ? 'ON' : 'OFF'}
+                    </td>
+                    <td
+                      className={
+                        reading.east_blower_south_active
+                          ? 'active-table-cell'
+                          : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.east_blower_south_active ? 'ON' : 'OFF'}
+                    </td>
+                    <td
+                      className={
+                        reading.west_blower_active ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.west_blower_active ? 'ON' : 'OFF'}
+                    </td>
+                    <td>{reading.east_blower_header_pressure}</td>
+                    <td>{reading.west_blower_header_pressure}</td>
+                    <td
+                      className={
+                        reading.aeration_tank_overflow ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.aeration_tank_overflow ? 'Yes' : 'No'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TabPanel>
 
-        {/* GA Tab */}
-        <TabPanel>
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Room Temp</th>
-                <th>Battery</th>
-                <th>Block Heater</th>
-                <th>Autostart</th>
-                <th>Hours</th>
-                <th>Fuel Tank Level</th>
-                <th>Transfer Switch</th>
-                <th>Generator at Rest</th>
-                <th>PLC Active</th>
-              </tr>
-            </thead>
-            <tbody>
-              {plantReadings.map((reading) => (
-                <tr key={reading.id}>
-                  <td>{new Date(reading.timestamp).toLocaleDateString('en-GB')}</td>
-                  <td>{reading.diesel_room_temperature}</td>
-                  <td>{reading.battery_voltage}</td>
-                  <td>{reading.block_heater_active ? 'Active' : 'Inactive'}</td>
-                  <td>{reading.generator_autostart ? 'Yes' : 'No'}</td>
-                  <td>{`${reading.generator_hours}:${reading.generator_minutes}`}</td>
-                  <td>{reading.fuel_tank_level}</td>
-                  <td>{reading.transfer_switch_active ? 'Active' : 'Inactive'}</td>
-                  <td>{reading.generator_at_rest ? 'Yes' : 'No'}</td>
-                  <td>{reading.plc_active ? 'Active' : 'Inactive'}</td>
+          {/* GA Tab */}
+          <TabPanel>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Room Temp</th>
+                  <th>Battery</th>
+                  <th>Block Heater</th>
+                  <th>Autostart</th>
+                  <th>Hours</th>
+                  <th>Fuel Tank Level</th>
+                  <th>Transfer Switch</th>
+                  <th>Generator at Rest</th>
+                  <th>PLC Active</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </TabPanel>
-      </Tabs>
+              </thead>
+              <tbody>
+                {plantReadings.map((reading) => (
+                  <tr key={reading.id}>
+                    <td>{new Date(reading.timestamp).toLocaleDateString('en-GB')}</td>
+                    <td>{reading.diesel_room_temperature}</td>
+                    <td>{reading.battery_voltage}</td>
+                    <td
+                      className={
+                        reading.block_heater_active ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.block_heater_active ? 'ON' : 'OFF'}
+                    </td>
+                    <td
+                      className={
+                        reading.generator_autostart ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.generator_autostart ? 'Yes' : 'No'}
+                    </td>
+                    <td>{`${reading.generator_hours} h / ${reading.generator_minutes} m`}</td>
+                    <td>{reading.fuel_tank_level}</td>
+                    <td
+                      className={
+                        reading.transfer_switch_active ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.transfer_switch_active ? 'ON' : 'OFF'}
+                    </td>
+                    <td
+                      className={
+                        reading.generator_at_rest ? 'active-table-cell' : 'inactive-table-cell'
+                      }
+                    >
+                      {reading.generator_at_rest ? 'Yes' : 'No'}
+                    </td>
+                    <td
+                      className={reading.plc_active ? 'active-table-cell' : 'inactive-table-cell'}
+                    >
+                      {reading.plc_active ? 'ON' : 'OFF'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TabPanel>
+
+          <TabPanel>
+            <TankSnapshotViewer snapshots={snapshots} />
+          </TabPanel>
+        </Tabs>
+      </div>
 
       {isAdmin ? (
         <Button onClick={handleLogout}>Logout</Button>
