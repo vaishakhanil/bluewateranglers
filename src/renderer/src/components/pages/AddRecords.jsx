@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormField } from '../molecules'
 import { TankTable } from '../organisms/TankTable/TankTable'
 import { TankForm } from './AddTanks'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { Button } from '../atoms'
 
 export const AddRecords = () => {
   const navigate = useNavigate()
+  const { id } = useParams()
   const today = new Date().toLocaleDateString('en-GB') // DD/MM/YYYY
 
   const [formData, setFormData] = useState({
@@ -36,6 +38,21 @@ export const AddRecords = () => {
     alarm_activated: false,
     operator_name: ''
   })
+
+  useEffect(() => {
+    if (id) {
+      const fetchData = async () => {
+        const data = await window.electron.api.getRecordById(id) // Replace with your actual API call
+        if (data) {
+          console.log(data)
+          setFormData(data) // Assuming 'plant_reading' is the key for the form data
+          setTanks(data.tank_snapshots) // Set tanks data if available
+        }
+      }
+
+      fetchData()
+    }
+  }, [id])
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target
@@ -90,11 +107,16 @@ export const AddRecords = () => {
       tanks: tanks.map(normalizeValues)
     }
 
-    console.log('Submitting Payload:', payload)
     try {
-      // const result = await window.electron.api.editRecords(payload) // wORKS FINE
-      const result = await window.electron.api.insertRecords(payload)
-      console.log(result)
+      if (id) {
+        const result = await window.electron.api.editRecords(payload)
+        navigate('/')
+        console.log(result)
+      } else {
+        const result = await window.electron.api.insertRecords(payload)
+        navigate('/')
+        console.log(result)
+      }
     } catch (error) {
       console.log(error)
     }
@@ -102,7 +124,7 @@ export const AddRecords = () => {
 
   return (
     <div className="add-record-container">
-      <div className="add-record-container">
+      <div className="add-records-container">
         <FormField label="DATE" name="date" value={today} disabled />
 
         <FormField
@@ -112,63 +134,43 @@ export const AddRecords = () => {
           onChange={handleChange}
         />
 
-        <FormField
-          label="PUMP #1"
-          name="pump_1_active"
-          type="checkbox"
-          value={formData.pump_1_active}
-          onChange={handleChange}
-        />
-        <FormField
-          label="PUMP #2"
-          name="pump_2_active"
-          type="checkbox"
-          value={formData.pump_2_active}
-          onChange={handleChange}
-        />
-        <FormField
-          label="PUMP #3"
-          name="pump_3_active"
-          type="checkbox"
-          value={formData.pump_3_active}
-          onChange={handleChange}
-        />
-        <FormField
-          label="PUMP #4"
-          name="pump_4_active"
-          type="checkbox"
-          value={formData.pump_4_active}
-          onChange={handleChange}
-        />
-        <FormField
-          label="EAST PUMP"
-          name="east_pump_active"
-          type="checkbox"
-          value={formData.east_pump_active}
-          onChange={handleChange}
-        />
-
-        <FormField
-          label="EAST BLOWER NORTH"
-          name="east_blower_north_active"
-          type="checkbox"
-          value={formData.east_blower_north_active}
-          onChange={handleChange}
-        />
-        <FormField
-          label="WEST BLOWER"
-          name="west_blower_active"
-          type="checkbox"
-          value={formData.west_blower_active}
-          onChange={handleChange}
-        />
-        <FormField
-          label="EAST BLOWER SOUTH"
-          name="east_blower_south_active"
-          type="checkbox"
-          value={formData.east_blower_south_active}
-          onChange={handleChange}
-        />
+        <div className="form__pumps-block">
+          <FormField
+            label="PUMP #1"
+            name="pump_1_active"
+            type="checkbox"
+            value={formData.pump_1_active}
+            onChange={handleChange}
+          />
+          <FormField
+            label="PUMP #2"
+            name="pump_2_active"
+            type="checkbox"
+            value={formData.pump_2_active}
+            onChange={handleChange}
+          />
+          <FormField
+            label="PUMP #3"
+            name="pump_3_active"
+            type="checkbox"
+            value={formData.pump_3_active}
+            onChange={handleChange}
+          />
+          <FormField
+            label="PUMP #4"
+            name="pump_4_active"
+            type="checkbox"
+            value={formData.pump_4_active}
+            onChange={handleChange}
+          />
+          <FormField
+            label="EAST PUMP"
+            name="east_pump_active"
+            type="checkbox"
+            value={formData.east_pump_active}
+            onChange={handleChange}
+          />
+        </div>
 
         <FormField
           label="EAST WELL PRESSURE"
@@ -182,6 +184,31 @@ export const AddRecords = () => {
           value={formData.water_temperature}
           onChange={handleChange}
         />
+
+        <div className="form__blowers-block">
+          <FormField
+            label="EAST BLOWER NORTH"
+            name="east_blower_north_active"
+            type="checkbox"
+            value={formData.east_blower_north_active}
+            onChange={handleChange}
+          />
+          <FormField
+            label="WEST BLOWER"
+            name="west_blower_active"
+            type="checkbox"
+            value={formData.west_blower_active}
+            onChange={handleChange}
+          />
+          <FormField
+            label="EAST BLOWER SOUTH"
+            name="east_blower_south_active"
+            type="checkbox"
+            value={formData.east_blower_south_active}
+            onChange={handleChange}
+          />
+        </div>
+
         <FormField
           label="EAST BLOWER HEADER PRESSURE"
           name="east_blower_header_pressure"
@@ -216,33 +243,38 @@ export const AddRecords = () => {
           onChange={handleChange}
         />
 
-        <FormField
-          label="BLOCK HEATER ACTIVE"
-          name="block_heater_active"
-          type="checkbox"
-          value={formData.block_heater_active}
-          onChange={handleChange}
-        />
-        <FormField
-          label="GENERATOR AUTOSTART"
-          name="generator_autostart"
-          type="checkbox"
-          value={formData.generator_autostart}
-          onChange={handleChange}
-        />
+        <div className="form__generator-block">
+          <FormField
+            label="BLOCK HEATER ACTIVE"
+            name="block_heater_active"
+            type="checkbox"
+            value={formData.block_heater_active}
+            onChange={handleChange}
+          />
+          <FormField
+            label="GENERATOR AUTOSTART"
+            name="generator_autostart"
+            type="checkbox"
+            value={formData.generator_autostart}
+            onChange={handleChange}
+          />
+        </div>
 
-        <FormField
-          label="GENERATOR HOURS"
-          name="generator_hours"
-          value={formData.generator_hours}
-          onChange={handleChange}
-        />
-        <FormField
-          label="GENERATOR MINUTES"
-          name="generator_minutes"
-          value={formData.generator_minutes}
-          onChange={handleChange}
-        />
+        <div>
+          <FormField
+            label="GENERATOR HOURS"
+            name="generator_hours"
+            value={formData.generator_hours}
+            onChange={handleChange}
+          />
+          <FormField
+            label="GENERATOR MINUTES"
+            name="generator_minutes"
+            value={formData.generator_minutes}
+            onChange={handleChange}
+          />
+        </div>
+
         <FormField
           label="FUEL TANK LEVEL"
           name="fuel_tank_level"
@@ -250,34 +282,36 @@ export const AddRecords = () => {
           onChange={handleChange}
         />
 
-        <FormField
-          label="TRANSFER SWITCH ACTIVE"
-          name="transfer_switch_active"
-          type="checkbox"
-          value={formData.transfer_switch_active}
-          onChange={handleChange}
-        />
-        <FormField
-          label="GENERATOR AT REST"
-          name="generator_at_rest"
-          type="checkbox"
-          value={formData.generator_at_rest}
-          onChange={handleChange}
-        />
-        <FormField
-          label="PLC ACTIVE"
-          name="plc_active"
-          type="checkbox"
-          value={formData.plc_active}
-          onChange={handleChange}
-        />
-        <FormField
-          label="ALARM ACTIVATED"
-          name="alarm_activated"
-          type="checkbox"
-          value={formData.alarm_activated}
-          onChange={handleChange}
-        />
+        <div className="form__control-block">
+          <FormField
+            label="TRANSFER SWITCH ACTIVE"
+            name="transfer_switch_active"
+            type="checkbox"
+            value={formData.transfer_switch_active}
+            onChange={handleChange}
+          />
+          <FormField
+            label="GENERATOR AT REST"
+            name="generator_at_rest"
+            type="checkbox"
+            value={formData.generator_at_rest}
+            onChange={handleChange}
+          />
+          <FormField
+            label="PLC ACTIVE"
+            name="plc_active"
+            type="checkbox"
+            value={formData.plc_active}
+            onChange={handleChange}
+          />
+          <FormField
+            label="ALARM ACTIVATED"
+            name="alarm_activated"
+            type="checkbox"
+            value={formData.alarm_activated}
+            onChange={handleChange}
+          />
+        </div>
 
         <FormField
           label="OPERATOR NAME"
@@ -285,12 +319,15 @@ export const AddRecords = () => {
           value={formData.operator_name}
           onChange={handleChange}
         />
+
+        <div className="form__button-container">
+          <Button onClick={handleSubmit}>Save</Button>
+          <Button onClick={() => navigate('/')}>Exit</Button>
+        </div>
       </div>
 
-      <div>
-        <h3>Tanks</h3>
-        <button onClick={handleAddClick}>Add Tank</button>
-
+      <div className="add-tanks-container">
+        <Button onClick={handleAddClick}>Add Tank</Button>
         {isFormOpen ? (
           <TankForm
             initialData={editIndex !== null ? tanks[editIndex] : {}}
@@ -300,11 +337,6 @@ export const AddRecords = () => {
         ) : (
           <TankTable tanks={tanks} onEdit={handleEdit} onDelete={handleDelete} />
         )}
-      </div>
-
-      <div style={{ marginTop: '2rem' }}>
-        <button onClick={handleSubmit}>Submit Record</button>
-        <button onClick={() => navigate('/')}>Back</button>
       </div>
     </div>
   )

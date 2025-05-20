@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-const Input = styled.input`
+const Select = styled.select`
   padding: 10px 16px;
   border: none;
   border-radius: 4px;
@@ -10,7 +10,7 @@ const Input = styled.input`
   color: var(--ba-text-black);
 
   &:disabled {
-    background-color: var(--ba-input-locked);
+    background-color: var(--ba-Select-locked);
     cursor: not-allowed;
   }
 
@@ -19,4 +19,4 @@ const Input = styled.input`
   }
 `
 
-export default Input
+export default Select

@@ -63,6 +63,12 @@ body {
   margin: 5px;
 }
 
+.react-tabs__tab-list,
+td,
+th {
+  font-size: 1.4rem;
+}
+
 .tab-container {
   width: 100vw;
   display: flex;
@@ -117,10 +123,117 @@ tr:hover {
   background-color: var(--ba-button-red);
 }
 
+.add-record-container {
+  display: flex;
+  margin: 20px;
+}
+
+.add-records-container {
+  width: 60%;
+}
+
+.form__pumps-block {
+  display: flex;
+  /* border: 1px solid red; */
+  width: 80%;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.form__blowers-block,
+.form__generator-block,
+.form__control-block {
+  display: flex;
+  /* border: 1px solid red; */
+  width: 80%;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+}
+
+.form__button-container {
+  margin: 1px;
+}
+
+.tank_settings_table {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.footer {
+  display: flex;
+  /* justify-content: space-evenly; */
+  align-items: center;
+  margin-bottom: 10;
+}
+
+.footer .pagination {
+  margin-left: 45%;
+}
+
 /* MEDIUM SCREENS */
 @media (max-width: 1200px) {
   tr {
     font-size: 0.9rem;
+  }
+  .footer .pagination {
+    margin-left: 40%;
+  }
+
+  .add-record-container {
+    margin: 0;
+  }
+
+  .add-record-container {
+    width: 100vw;
+    display: flex;
+  }
+
+  .add-records-container {
+    width: 60%;
+    margin-right: 20px;
+  }
+
+  .add-tanks-container {
+    width: 40%;
+  }
+
+  .form__tank-block {
+    display: flex;
+  }
+  .tank-form label {
+    font-size: 12px;
+    margin: 2px;
+  }
+  .tank-form input {
+    width: 100px;
+  }
+
+  .tank_table th {
+    font-size: 0.8em;
+  }
+  .form__pumps-block {
+    width: 100%;
+  }
+
+  .form-field-container {
+    display: flex;
+    margin: 0;
+    padding: 0;
+  }
+  .form-field-container label {
+    font-size: 12px;
+  }
+  .form-field-container input {
+    height: 14px;
+    justify-self: end;
+    align-self: center;
+  }
+
+  .form-field-container {
+    margin: 0px;
   }
 }
 

@@ -1,6 +1,8 @@
+import { Button } from '../../atoms'
+
 export const TankTable = ({ tanks, onEdit, onDelete }) => {
   return (
-    <table>
+    <table className="tank_table">
       <thead>
         <tr>
           <th>Tank Name</th>
@@ -28,8 +30,8 @@ export const TankTable = ({ tanks, onEdit, onDelete }) => {
             <td>{tank.diet_type}</td>
             <td>{tank.mort}</td>
             <td>
-              <button onClick={() => onEdit(index)}>Edit</button>
-              <button onClick={() => onDelete(index)}>Delete</button>
+              <Button onClick={() => onEdit(index)}>Edit</Button>
+              <Button onClick={() => onDelete(index)}>Delete</Button>
             </td>
           </tr>
         ))}

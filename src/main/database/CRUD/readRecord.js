@@ -99,3 +99,43 @@ export const getDataUsingDate = (start, end) => {
 
   return result
 }
+
+export const getRecordById = (id) => {
+  // 1. Get the plant_reading by the given id
+  const reading = db
+    .prepare(
+      `
+      SELECT * FROM plant_readings
+      WHERE id = ?
+      `
+    )
+    .get(id)
+
+  if (!reading) return null // If no record is found, return null
+
+  // 2. Get all related tank_snapshots with tank name for the given reading_id
+  const snapshots = db
+    .prepare(
+      `
+      SELECT 
+        ts.*, 
+        t.tank_name 
+      FROM tank_snapshots ts
+      LEFT JOIN tanks t ON ts.tank_id = t.tank_id
+      WHERE ts.reading_id = ?
+      `
+    )
+    .all(id)
+
+  // 3. Attach snapshots to the reading
+  const result = {
+    ...reading,
+    tank_snapshots: snapshots
+  }
+
+  return result
+}
+
+export const getPreviousWeekTankInfo = (tankName) => {
+  console.log(tankName)
+}

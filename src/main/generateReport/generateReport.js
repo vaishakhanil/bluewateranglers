@@ -106,12 +106,27 @@ export const exportToExcel = async (plantReadings, startDate, endDate) => {
   )
 
   const snapshotCleanUp = allSnapshots.map(
-    ({ snapshot_id, reading_id, tank_id, tank_name, flow, clean, timestamp, ...rest }) => {
+    ({
+      snapshot_id,
+      reading_id,
+      tank_id,
+      tank_name,
+      flow,
+      clean,
+      timestamp,
+      fish_size,
+      food_size,
+      diet,
+      ...rest
+    }) => {
       return {
         timestamp,
         tank_name,
         flow: flow === 1 ? 'TRUE' : 'FALSE',
         clean: clean === 1 ? 'TRUE' : 'FALSE',
+        'Fish Size': Number(fish_size).toFixed(2),
+        'Food Size': Number(food_size).toFixed(1),
+        Diet: Number(diet).toFixed(2),
         ...rest
       }
     }

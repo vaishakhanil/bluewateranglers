@@ -8,7 +8,10 @@ import {
   editRecords,
   deleteRecords,
   getPaginatedReadings,
-  getDataUsingDate
+  getDataUsingDate,
+  getRecordById,
+  getPreviousWeekTankInfo,
+  insertTanks
 } from './database/CRUD'
 import { ipcHandleAuth } from './auth/auth'
 import { setRole } from './auth/store'
@@ -59,6 +62,16 @@ function handleIPC() {
     }
   })
 
+  ipcMain.handle('insert-tanks', async (event, tankName) => {
+    try {
+      const result = await insertTanks(tankName)
+      return result
+    } catch (error) {
+      console.error('Error inserting tank name: ', error)
+      throw error
+    }
+  })
+
   // Edit Records
   ipcMain.handle('edit-records', async (event, readingData) => {
     try {
@@ -92,6 +105,17 @@ function handleIPC() {
     const { start, end } = dates
     const readings = getDataUsingDate(start, end)
     await exportToExcel(readings, start, end)
+  })
+
+  // Get record by ID
+  ipcMain.handle('get-record-by-id', async (event, id) => {
+    const result = getRecordById(id)
+    return result
+  })
+
+  ipcMain.handle('get-previous-week-tank-info', (event, tankName) => {
+    const result = getPreviousWeekTankInfo(tankName)
+    return result
   })
 }
 

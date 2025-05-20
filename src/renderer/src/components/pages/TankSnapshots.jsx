@@ -1,7 +1,12 @@
 import { useState, useMemo } from 'react'
+import { Button } from '../atoms'
+import { useNavigate } from 'react-router-dom'
+import { Select } from '../atoms/Inputs'
 
 export const TankSnapshotViewer = (data = []) => {
+  const navigate = useNavigate()
   const snapshotArray = data.snapshots
+  const isAdmin = data.isAdmin
 
   const tankNames = useMemo(() => {
     const unique = new Map()
@@ -11,6 +16,7 @@ export const TankSnapshotViewer = (data = []) => {
         unique.set(name, snap.tank_name)
       }
     })
+    console.log(snapshotArray)
     return Array.from(unique.values())
   }, [])
 
@@ -35,19 +41,24 @@ export const TankSnapshotViewer = (data = []) => {
     (snap) => snap.tank_name.toLowerCase() === currentTankName.toLowerCase()
   )
 
+  const handleEdit = (id) => {
+    console.log(id)
+    navigate(`/addRecords/${id}`)
+  }
+
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+      <div className="tank_settings_table">
         <h3>TANK</h3>
-        <select value={currentTankName} onChange={handleDropdownChange}>
+        <Select value={currentTankName} onChange={handleDropdownChange}>
           {tankNames.map((name, idx) => (
             <option key={idx} value={name}>
               {name}
             </option>
           ))}
-        </select>
-        <button onClick={handlePrev}>⬅️</button>
-        <button onClick={handleNext}>➡️</button>
+        </Select>
+        <Button onClick={handlePrev}>&#8592;</Button>
+        <Button onClick={handleNext}>&#8594;</Button>
       </div>
 
       <table>
@@ -62,6 +73,7 @@ export const TankSnapshotViewer = (data = []) => {
             <th>Diet</th>
             <th>Diet Type</th>
             <th>Mortality</th>
+            {isAdmin && <th>Action</th>}
           </tr>
         </thead>
         <tbody>
@@ -71,7 +83,7 @@ export const TankSnapshotViewer = (data = []) => {
               <td className={snap.flow ? 'active-table-cell' : 'inactive-table-cell'}>
                 {snap.flow ? 'True' : 'False'}
               </td>
-              <td className={snap.flow ? 'active-table-cell' : 'inactive-table-cell'}>
+              <td className={snap.clean ? 'active-table-cell' : 'inactive-table-cell'}>
                 {snap.clean ? 'True' : 'False'}
               </td>
               <td>{snap.do_level}</td>
@@ -80,6 +92,14 @@ export const TankSnapshotViewer = (data = []) => {
               <td>{snap.diet}</td>
               <td>{snap.diet_type}</td>
               <td>{snap.mort}</td>
+              {isAdmin && (
+                <td>
+                  <Button variant={'primary'} onClick={() => handleEdit(snap.reading_id)}>
+                    {' '}
+                    Edit{' '}
+                  </Button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

@@ -9,6 +9,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/generateReports" element={<GenerateReports />} />
         <Route path="/addRecords" element={<AddRecords />} />
+        <Route path="/addRecords/:id" element={<AddRecords />} />
       </Routes>
     </Router>
   )

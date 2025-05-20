@@ -69,11 +69,18 @@ export const initializeDatabase = () => {
         tank_id TEXT PRIMARY KEY DEFAULT (uuid()),
         tank_name TEXT UNIQUE NOT NULL
       );
+
+      CREATE TABLE IF NOT EXISTS fish_types (
+          fish_type_id TEXT PRIMARY KEY DEFAULT (uuid()),
+          fish_type_name TEXT UNIQUE NOT NULL
+      );
     
       CREATE TABLE IF NOT EXISTS tank_snapshots (
         snapshot_id TEXT PRIMARY KEY DEFAULT (uuid()),
         reading_id TEXT,
         tank_id TEXT,
+        fish_type_id TEXT,
+        number_of_fishes INTEGER DEFAULT 0,
         flow INTEGER DEFAULT 0,
         clean INTEGER DEFAULT 0,
         do_level INTEGER DEFAULT 0,
@@ -83,7 +90,8 @@ export const initializeDatabase = () => {
         diet_type TEXT CHECK (diet_type IN ('L', 'gm')),
         mort INTEGER DEFAULT 0,
         FOREIGN KEY (reading_id) REFERENCES plant_readings(id) ON DELETE CASCADE,
-        FOREIGN KEY (tank_id) REFERENCES tanks(tank_id) ON DELETE CASCADE
+        FOREIGN KEY (tank_id) REFERENCES tanks(tank_id) ON DELETE CASCADE,
+        FOREIGN KEY (fish_type_id) REFERENCES fish_types(fish_type_id) ON DELETE SET NULL
       );
 
       CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_reading_tank ON tank_snapshots(reading_id, tank_id);

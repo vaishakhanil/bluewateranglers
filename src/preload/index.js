@@ -10,6 +10,9 @@ contextBridge.exposeInMainWorld('electron', {
     insertRecords: async (readingData) => {
       return ipcRenderer.invoke('insert-records', readingData)
     },
+    insertTanks: async (tankName) => {
+      return ipcRenderer.invoke('insert-tanks', tankName)
+    },
     editRecords: async (readingData) => {
       return ipcRenderer.invoke('edit-records', readingData)
     },
@@ -21,6 +24,12 @@ contextBridge.exposeInMainWorld('electron', {
     },
     generateExcel: async (dates) => {
       return ipcRenderer.invoke('generate-excel', dates)
+    },
+    getRecordById: async (id) => {
+      return ipcRenderer.invoke('get-record-by-id', id)
+    },
+    getPreviousWeekTankInfo: async (tankName) => {
+      return ipcRenderer.invoke('get-previous-week-tank-info', tankName)
     }
   },
   auth: {

@@ -140,3 +140,36 @@ export const insertRecords = (readingData) => {
     return error
   }
 }
+
+export const insertTanks = (tankName) => {
+  db.prepare('BEGIN TRANSACTION').run()
+  let tankId = null
+  try {
+    tankId = insertTankLogic(tankName)
+    if (!tankId) throw new Error('Tank ID is null')
+    return { success: true, message: 'Tank Name inserted successfully' }
+  } catch (error) {
+    db.prepare('ROLLBACK').run()
+    console.error('Error during transaction:', error)
+    return error
+  }
+}
+
+const insertTankLogic = (tankName) => {
+  // Check if the tank already exists
+  const checkStmt = db.prepare(`SELECT tank_id FROM tanks WHERE tank_name = ?`)
+  const existingTank = checkStmt.get(tankName)
+  let tankId = null
+
+  if (existingTank) {
+    // If the tank exists, use the existing tank ID
+    tankId = existingTank.tank_id
+  } else {
+    // If the tank doesn't exist, insert it into the tanks table
+    const insertTankStmt = db.prepare(`INSERT INTO tanks (tank_name) VALUES (?) RETURNING tank_id`)
+    const insertResult = insertTankStmt.get(tankName)
+    tankId = insertResult.tank_id
+  }
+
+  return tankId
+}

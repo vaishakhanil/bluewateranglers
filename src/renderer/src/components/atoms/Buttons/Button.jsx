@@ -2,12 +2,12 @@ import styled from 'styled-components'
 
 const Button = styled.button`
   padding: 10px 16px;
+  margin: 10px;
   border: none;
   border-radius: 4px;
   font-weight: 600;
   font-size: 20px;
   cursor: pointer;
-  margin: 50px;
   transition: all 0.2s ease-in-out;
 
   ${({ variant }) => {

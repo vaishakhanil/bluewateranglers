@@ -1,6 +1,20 @@
-import { insertRecords } from './insertRecords'
+import { insertRecords, insertTanks } from './insertRecords'
 import { editRecords } from './editRecords'
 import { deleteRecords } from './deleteRecords'
-import { getPaginatedReadings, getDataUsingDate } from './readRecord'
+import {
+  getPaginatedReadings,
+  getDataUsingDate,
+  getRecordById,
+  getPreviousWeekTankInfo
+} from './readRecord'
 
-export { insertRecords, editRecords, deleteRecords, getPaginatedReadings, getDataUsingDate }
+export {
+  insertRecords,
+  insertTanks,
+  editRecords,
+  deleteRecords,
+  getPaginatedReadings,
+  getDataUsingDate,
+  getRecordById,
+  getPreviousWeekTankInfo
+}

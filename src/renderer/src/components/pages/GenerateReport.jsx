@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Header } from '../organisms/Header/Header'
 import { Loader } from '../organisms/Loader/Loader'
+import { Button } from '../atoms'
+import { FormField } from '../molecules'
 
 export const GenerateReports = () => {
   const [startDate, setStartDate] = useState('')
@@ -42,30 +44,26 @@ export const GenerateReports = () => {
       {loading && <Loader />}
       <Header displayMenus={false} displayReportMenu={true} />
       <div style={{ padding: '2rem' }}>
-        <h2>Export Plant Data</h2>
+        <h2>Export Data to Excel</h2>
         <div style={{ marginBottom: '1rem' }}>
-          <label>
-            Start Date:{' '}
-            <input
-              type="datetime-local"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-          </label>
+          <FormField
+            label="Start Date"
+            type="datetime-local"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
         </div>
         <div style={{ marginBottom: '1rem' }}>
-          <label>
-            End Date:{' '}
-            <input
-              type="datetime-local"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </label>
+          <FormField
+            label="End Date"
+            type="datetime-local"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
         </div>
-        <button onClick={handleExport} disabled={loading}>
+        <Button onClick={handleExport} disabled={loading}>
           {loading ? 'Generating...' : 'Generate Excel'}
-        </button>
+        </Button>
       </div>
     </>
   )

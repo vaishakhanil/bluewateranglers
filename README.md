@@ -12,7 +12,13 @@
 8.  Generate Reports - done
 9.  Load all 800 records and tables
 
-TODO: 1. FIX THE TABLE & TANK 2. FIX THE EDIT & SAVE 3. SEARCH FEATURE 4. PYTHON BACKUPS
+TODO:
+
+1.  FIX THE TABLE & TANK - DONE
+2.  FIX THE EDIT & SAVE - DONE
+3.  SEARCH FEATURE
+4.  PYTHON BACKUPS
+5.  FIX STYLES
 
     {/\*
     DATE

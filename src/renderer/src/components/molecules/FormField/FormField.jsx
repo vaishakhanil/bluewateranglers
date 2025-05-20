@@ -14,7 +14,7 @@ export const FormField = ({
 
   return (
     <div className="form-field-container">
-      <Labels htmlFor={name} invalid={invalid}>
+      <Labels isCheckbox={isCheckbox} className="form__labels" htmlFor={name} invalid={invalid}>
         {label}
       </Labels>
       <Input
