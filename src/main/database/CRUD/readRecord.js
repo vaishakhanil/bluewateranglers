@@ -139,3 +139,9 @@ export const getRecordById = (id) => {
 export const getPreviousWeekTankInfo = (tankName) => {
   console.log(tankName)
 }
+
+export const getAllTankInfo = () => {
+  console.log('hit')
+  const AllTanks = db.prepare('SELECT * FROM TANKS').all()
+  return AllTanks
+}

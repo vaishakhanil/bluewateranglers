@@ -5,7 +5,8 @@ import {
   getPaginatedReadings,
   getDataUsingDate,
   getRecordById,
-  getPreviousWeekTankInfo
+  getPreviousWeekTankInfo,
+  getAllTankInfo
 } from './readRecord'
 
 export {
@@ -16,5 +17,6 @@ export {
   getPaginatedReadings,
   getDataUsingDate,
   getRecordById,
-  getPreviousWeekTankInfo
+  getPreviousWeekTankInfo,
+  getAllTankInfo
 }

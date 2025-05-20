@@ -30,6 +30,9 @@ contextBridge.exposeInMainWorld('electron', {
     },
     getPreviousWeekTankInfo: async (tankName) => {
       return ipcRenderer.invoke('get-previous-week-tank-info', tankName)
+    },
+    getAllTankInfo: async () => {
+      return ipcRenderer.invoke('get-all-tank-info')
     }
   },
   auth: {

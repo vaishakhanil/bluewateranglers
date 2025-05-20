@@ -11,7 +11,8 @@ import {
   getDataUsingDate,
   getRecordById,
   getPreviousWeekTankInfo,
-  insertTanks
+  insertTanks,
+  getAllTankInfo
 } from './database/CRUD'
 import { ipcHandleAuth } from './auth/auth'
 import { setRole } from './auth/store'
@@ -113,10 +114,16 @@ function handleIPC() {
     return result
   })
 
-  ipcMain.handle('get-previous-week-tank-info', (event, tankName) => {
+  ipcMain.handle('get-previous-week-tank-info', async (event, tankName) => {
     const result = getPreviousWeekTankInfo(tankName)
     return result
   })
+
+  ipcMain.handle('get-all-tank-info', async () => {
+    const result = getAllTankInfo()
+    return result
+  })
+
 }
 
 app.whenReady().then(() => {

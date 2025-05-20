@@ -67,6 +67,7 @@ export const initializeDatabase = () => {
     
       CREATE TABLE IF NOT EXISTS tanks (
         tank_id TEXT PRIMARY KEY DEFAULT (uuid()),
+        tank_active INTEGER DEFAULT 0,
         tank_name TEXT UNIQUE NOT NULL
       );
 

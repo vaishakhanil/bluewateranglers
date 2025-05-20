@@ -1,5 +1,11 @@
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
-import { Dashboard, LoginPage, GenerateReports, AddRecords } from './components/pages'
+import {
+  Dashboard,
+  LoginPage,
+  GenerateReports,
+  AddRecords,
+  ActivateTanks
+} from './components/pages'
 
 function App() {
   return (
@@ -10,6 +16,7 @@ function App() {
         <Route path="/generateReports" element={<GenerateReports />} />
         <Route path="/addRecords" element={<AddRecords />} />
         <Route path="/addRecords/:id" element={<AddRecords />} />
+        <Route path="/activateTanks" element={<ActivateTanks />} />
       </Routes>
     </Router>
   )

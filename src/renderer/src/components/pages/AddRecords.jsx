@@ -42,11 +42,10 @@ export const AddRecords = () => {
   useEffect(() => {
     if (id) {
       const fetchData = async () => {
-        const data = await window.electron.api.getRecordById(id) // Replace with your actual API call
+        const data = await window.electron.api.getRecordById(id)
         if (data) {
-          console.log(data)
-          setFormData(data) // Assuming 'plant_reading' is the key for the form data
-          setTanks(data.tank_snapshots) // Set tanks data if available
+          setFormData(data)
+          setTanks(data.tank_snapshots)
         }
       }
 
@@ -328,6 +327,7 @@ export const AddRecords = () => {
 
       <div className="add-tanks-container">
         <Button onClick={handleAddClick}>Add Tank</Button>
+        <Button onClick={() => navigate('/activateTanks')}>Activate Tanks</Button>
         {isFormOpen ? (
           <TankForm
             initialData={editIndex !== null ? tanks[editIndex] : {}}
