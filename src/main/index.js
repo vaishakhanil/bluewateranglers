@@ -20,43 +20,44 @@ import { ipcHandleAuth } from './auth/auth'
 import { setRole } from './auth/store'
 import { exportToExcel } from './generateReport/generateReport'
 
-
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater } from 'electron-updater'
 
 function setupAutoUpdater(mainWindow) {
-  autoUpdater.checkForUpdatesAndNotify();
+  mainWindow.once('ready-to-show', () => {
+    setTimeout(() => {
+      autoUpdater.checkForUpdatesAndNotify()
+    }, 1000)
+  })
 
   autoUpdater.on('checking-for-update', () => {
-    console.log('Checking for update...');
-  });
+    console.log('Checking for update...')
+  })
 
   autoUpdater.on('update-available', (info) => {
-    console.log('Update available:', info);
-    mainWindow.webContents.send('update_available');
-  });
+    console.log('Update available:', info)
+    mainWindow.webContents.send('update_available')
+  })
 
   autoUpdater.on('update-not-available', (info) => {
-    console.log('Update not available:', info);
-    mainWindow.webContents.send('update_not_available');
-  });
+    console.log('Update not available:', info)
+    mainWindow.webContents.send('update_not_available')
+  })
 
   autoUpdater.on('error', (err) => {
-    console.error('Error in auto-updater:', err);
-    mainWindow.webContents.send('update_error', err);
-  });
+    console.error('Error in auto-updater:', err)
+    mainWindow.webContents.send('update_error', err)
+  })
 
   autoUpdater.on('download-progress', (progressObj) => {
-    mainWindow.webContents.send('download_progress', progressObj);
-  });
+    mainWindow.webContents.send('download_progress', progressObj)
+  })
 
   autoUpdater.on('update-downloaded', () => {
-    mainWindow.webContents.send('update_downloaded');
+    mainWindow.webContents.send('update_downloaded')
     // Optionally restart automatically:
     // autoUpdater.quitAndInstall();
-  });
+  })
 }
-
-
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -89,7 +90,7 @@ function createWindow() {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-   return mainWindow
+  return mainWindow
 }
 
 function handleIPC() {
@@ -161,9 +162,9 @@ function handleIPC() {
   })
 
   ipcMain.handle('get-data-using-date', async (event, dates) => {
-    const {start, end} = dates
-    let orderType = "DESC"
-    if(dates.orderType) orderType = dates.orderType
+    const { start, end } = dates
+    let orderType = 'DESC'
+    if (dates.orderType) orderType = dates.orderType
     const result = await getDataUsingDate(start, end, orderType)
     return result
   })
