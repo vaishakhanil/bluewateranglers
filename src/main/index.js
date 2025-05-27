@@ -108,8 +108,8 @@ function handleIPC() {
   })
 
   // Get Paginated Data
-  ipcMain.handle('get-plant-readings', async (event, page = 1) => {
-    const data = await getPaginatedReadings(page)
+  ipcMain.handle('get-plant-readings', async (event, page = 1, month = null, year = null) => {
+    const data = await getPaginatedReadings(page, month, year)
     return { plant_readings: data }
   })
 
@@ -118,6 +118,14 @@ function handleIPC() {
     const { start, end } = dates
     const readings = getDataUsingDate(start, end)
     await exportToExcel(readings, start, end)
+  })
+
+  ipcMain.handle('get-data-using-date', async (event, dates) => {
+    const {start, end} = dates
+    let orderType = "DESC"
+    if(dates.orderType) orderType = dates.orderType
+    const result = await getDataUsingDate(start, end, orderType)
+    return result
   })
 
   // Get record by ID

@@ -1,8 +1,83 @@
-export const OperationsMenu = ({SendSearchValueToParent}) => {
-    
-    return(
-        <div>
-            This is a search filter
-        </div>
-    )
+import { useState } from 'react'
+import { Button, Dropdown } from '../../atoms'
+import PropTypes from 'prop-types'
+
+export const OperationsMenu = ({ SendSearchValueToParent }) => {
+  const initialFilter = {
+    month: '',
+    year: ''
+  }
+
+  const [filterDate, setFilterDate] = useState(initialFilter)
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFilterDate((prev) => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleClear = () => {
+    setFilterDate(initialFilter)
+    SendSearchValueToParent(initialFilter)
+  }
+
+  const monthOptions = [
+    { value: '', label: 'Select Month' },
+    { value: 1, label: 'January' },
+    { value: 2, label: 'February' },
+    { value: 3, label: 'March' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'May' },
+    { value: 6, label: 'June' },
+    { value: 7, label: 'July' },
+    { value: 8, label: 'August' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'October' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'December' }
+  ]
+
+  const currentYear = new Date().getFullYear()
+  const yearOptions = [{ value: '', label: 'Select Year' }]
+
+  // TODO: replace the hardcoded 2020 with the max date from database
+  for (let year = 2020; year <= currentYear; year++) {
+    yearOptions.push({ value: year, label: year })
+  }
+  return (
+    <div className="operation-menu--container">
+      <h2>Filter by Date</h2>
+
+      <label>Month</label>
+      <Dropdown name="month" value={filterDate.month} onChange={handleChange}>
+        {monthOptions.map(({ value, label }) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
+      </Dropdown>
+
+      <label>Year</label>
+      <Dropdown name="year" value={filterDate.year} onChange={handleChange}>
+        {yearOptions.map(({ value, label }) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
+      </Dropdown>
+
+      <Button variant="primary" onClick={() => SendSearchValueToParent(filterDate)}>
+        Search
+      </Button>
+      <Button variant="secondary" onClick={handleClear} style={{ marginLeft: '1rem' }}>
+        Clear
+      </Button>
+    </div>
+  )
+}
+
+OperationsMenu.propTypes = {
+  SendSearchValueToParent: PropTypes.func
 }

@@ -48,7 +48,7 @@ export const GenerateReports = () => {
         <div style={{ marginBottom: '1rem' }}>
           <FormField
             label="Start Date"
-            type="datetime-local"
+            type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
@@ -56,7 +56,7 @@ export const GenerateReports = () => {
         <div style={{ marginBottom: '1rem' }}>
           <FormField
             label="End Date"
-            type="datetime-local"
+            type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />

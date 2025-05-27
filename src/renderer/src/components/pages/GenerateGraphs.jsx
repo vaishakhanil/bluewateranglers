@@ -1,186 +1,175 @@
 import * as d3 from 'd3'
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export const GenerateGraphs = () => {
-  const ref = useRef()
-  const [activeSeries, setActiveSeries] = useState(['Series A', 'Series B']) // Toggle series
+  const navigate = useNavigate()
+  const svgRef = useRef()
 
-  const data = [
-    {
-      name: 'Series A',
-      values: [
-        { date: new Date(2023, 0, 1), value: 30 },
-        { date: new Date(2023, 1, 1), value: 50 },
-        { date: new Date(2023, 2, 1), value: 80 },
-        { date: new Date(2023, 3, 1), value: 65 }
-      ]
-    },
-    {
-      name: 'Series B',
-      values: [
-        { date: new Date(2023, 0, 1), value: 20 },
-        { date: new Date(2023, 1, 1), value: 40 },
-        { date: new Date(2023, 2, 1), value: 60 },
-        { date: new Date(2023, 3, 1), value: 70 }
-      ]
-    }
-  ]
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [fishType, setFishType] = useState('RAINBOW TROUT')
+  const [data, setData] = useState([])
+  const [weightPerWeek, setweightPerWeek] = useState([])
 
-  useEffect(() => {
-    const margin = { top: 40, right: 120, bottom: 50, left: 50 }
-    const width = 700 - margin.left - margin.right
-    const height = 400 - margin.top - margin.bottom
+  const [filterHeading, setFilterHeading] = useState(null)
 
-    const svgRoot = d3.select(ref.current)
-    svgRoot.selectAll('*').remove() // Clear on re-render
+  const fetchData = async () => {
+    if (!startDate || !endDate) return
+    try {
+      const dates = { start: startDate, end: endDate, orderType: 'ASC' }
+      const result = await window.electron.api.getDataUsingDate(dates)
 
-    const svg = svgRoot
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`)
-
-    const filteredData = data.filter((d) => activeSeries.includes(d.name))
-
-    const allDates = filteredData.flatMap((d) => d.values.map((v) => v.date))
-    const allValues = filteredData.flatMap((d) => d.values.map((v) => v.value))
-
-    const x = d3.scaleTime().domain(d3.extent(allDates)).range([0, width])
-    const y = d3
-      .scaleLinear()
-      .domain([0, d3.max(allValues)])
-      .range([height, 0])
-    const color = d3.scaleOrdinal(d3.schemeCategory10)
-
-    const xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat('%b %Y'))
-    const yAxis = d3.axisLeft(y)
-
-    const clipId = 'clip-area'
-    svg
-      .append('defs')
-      .append('clipPath')
-      .attr('id', clipId)
-      .append('rect')
-      .attr('width', width)
-      .attr('height', height)
-
-    const chartArea = svg.append('g').attr('clip-path', `url(#${clipId})`)
-
-    const xAxisGroup = svg.append('g').attr('transform', `translate(0,${height})`).call(xAxis)
-    const yAxisGroup = svg.append('g').call(yAxis)
-
-    const line = d3
-      .line()
-      .x((d) => x(d.date))
-      .y((d) => y(d.value))
-
-    const tooltip = d3
-      .select('body')
-      .append('div')
-      .style('position', 'absolute')
-      .style('background', 'rgba(0,0,0,0.7)')
-      .style('color', 'white')
-      .style('padding', '6px 10px')
-      .style('border-radius', '4px')
-      .style('font-size', '12px')
-      .style('opacity', 0)
-      .style('pointer-events', 'none')
-
-    // Draw each line
-    filteredData.forEach((series) => {
-      chartArea
-        .append('path')
-        .datum(series.values)
-        .attr('fill', 'none')
-        .attr('stroke', color(series.name))
-        .attr('stroke-width', 2)
-        .attr('d', line)
-        .attr('class', `line-${series.name.replace(/\s+/g, '-')}`)
-        .on('click', function () {
-          const currentStroke = d3.select(this).attr('stroke-width')
-          d3.select(this).attr('stroke-width', currentStroke === '2' ? 4 : 2)
-        })
-
-      // Add points
-      chartArea
-        .selectAll(`.point-${series.name}`)
-        .data(series.values)
-        .enter()
-        .append('circle')
-        .attr('cx', (d) => x(d.date))
-        .attr('cy', (d) => y(d.value))
-        .attr('r', 4)
-        .attr('fill', color(series.name))
-        .on('mouseover', (event, d) => {
-          tooltip
-            .style('opacity', 1)
-            .html(
-              `<strong>${series.name}</strong><br>${d3.timeFormat('%b %d, %Y')(d.date)}: ${d.value}`
-            )
-            .style('left', event.pageX + 10 + 'px')
-            .style('top', event.pageY - 20 + 'px')
-        })
-        .on('mouseout', () => tooltip.style('opacity', 0))
-    })
-
-    // Add zoom functionality
-    const zoom = d3
-      .zoom()
-      .scaleExtent([1, 5])
-      .translateExtent([
-        [0, 0],
-        [width, height]
-      ])
-      .extent([
-        [0, 0],
-        [width, height]
-      ])
-      .on('zoom', (event) => {
-        const newX = event.transform.rescaleX(x)
-        const newY = event.transform.rescaleY(y)
-
-        xAxisGroup.call(d3.axisBottom(newX).tickFormat(d3.timeFormat('%b %Y')))
-        yAxisGroup.call(d3.axisLeft(newY))
-
-        chartArea
-          .selectAll('path')
-          .attr('d', (d) => line.x((dp) => newX(dp.date)).y((dp) => newY(dp.value))(d))
-
-        chartArea
-          .selectAll('circle')
-          .attr('cx', (d) => newX(d.date))
-          .attr('cy', (d) => newY(d.value))
+      const filteredSnapshots = result.flatMap((reading) => {
+        const ts = reading.timestamp
+        return reading.tank_snapshots
+          .filter((s) => s.fish_type_name.toLowerCase() === fishType.toLowerCase())
+          .map((s) => ({ ...s, timestamp: ts }))
       })
 
-    svgRoot.call(zoom)
+      setData(filteredSnapshots)
 
-    return () => {
-      tooltip.remove()
+      const weeklyData = d3
+        .rollups(
+          filteredSnapshots,
+          (v) => d3.sum(v, (d) => d.fish_size || 0),
+          (d) => d3.timeFormat('W%V-%Y')(new Date(d.timestamp))
+        )
+        .map(([week, totalWeight]) => ({ week, totalWeight }))
+
+      setweightPerWeek(weeklyData)
+      setFilterHeading({
+        fishType,
+        startDate,
+        endDate
+      })
+    } catch (err) {
+      console.error('Error fetching data:', err)
     }
-  }, [activeSeries])
+  }
 
-  const toggleSeries = (name) => {
-    setActiveSeries((prev) =>
-      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
-    )
+  useEffect(() => {
+    if (weightPerWeek.length === 0) return
+    drawChart()
+  }, [weightPerWeek])
+
+  const drawChart = () => {
+    const svg = d3.select(svgRef.current)
+    svg.selectAll('*').remove()
+
+    const numWeeks = weightPerWeek.length
+    const widthPerWeek = 60
+    const totalWidth = Math.max(numWeeks * widthPerWeek, 800)
+    const containerHeight = 500
+
+    const margin = { top: 40, right: 40, bottom: 100, left: 70 }
+    const width = totalWidth - margin.left - margin.right
+    const height = containerHeight - margin.top - margin.bottom
+
+    svg.attr('width', totalWidth).attr('height', containerHeight)
+
+    const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`)
+
+    const x = d3
+      .scalePoint()
+      .domain(weightPerWeek.map((d) => d.week))
+      .range([0, width])
+      .padding(0.5)
+
+    const maxY = Math.max(d3.max(weightPerWeek, (d) => d.totalWeight) || 0, 10)
+    const y = d3
+      .scaleLinear()
+      .domain([0, maxY * 1.2])
+      .nice()
+      .range([height, 0])
+
+    g.append('g')
+      .attr('transform', `translate(0,${height})`)
+      .call(d3.axisBottom(x))
+      .selectAll('text')
+      .style('font-size', '14px')
+      .attr('transform', 'rotate(-45)')
+      .style('text-anchor', 'end')
+
+    g.append('g')
+      .call(d3.axisLeft(y))
+      .selectAll('text')
+      .style('font-size', '14px')
+
+    g.append('path')
+      .datum(weightPerWeek)
+      .attr('fill', 'none')
+      .attr('stroke', '#ff6600')
+      .attr('stroke-width', 2)
+      .attr('d', d3.line()
+        .x((d) => x(d.week))
+        .y((d) => y(d.totalWeight))
+      )
+
+    g.selectAll('circle')
+      .data(weightPerWeek)
+      .enter()
+      .append('circle')
+      .attr('cx', (d) => x(d.week))
+      .attr('cy', (d) => y(d.totalWeight))
+      .attr('r', 4)
+      .attr('fill', 'steelblue')
+
+    const tooltip = d3
+      .select('.scroll-container')
+      .append('div')
+      .attr('class', 'tooltip')
+      .style('position', 'absolute')
+      .style('opacity', 0)
+      .style('background', '#fff')
+      .style('border', '1px solid #ccc')
+      .style('padding', '5px')
+
+    g.selectAll('circle')
+      .on('mouseover', (event, d) => {
+        tooltip.transition().duration(200).style('opacity', 1)
+        tooltip
+          .html(`Week: ${d.week}<br/>Weight: ${Number(d.totalWeight).toFixed(2)}`)
+          .style('left', `${event.pageX + 10}px`)
+          .style('top', `${event.pageY - 20}px`)
+      })
+      .on('mouseout', () => {
+        tooltip.transition().duration(300).style('opacity', 0)
+      })
   }
 
   return (
-    <>
-      <svg ref={ref}></svg>
-      <div style={{ marginTop: 10 }}>
-        <strong>Toggle Series:</strong>
-        {['Series A', 'Series B'].map((name) => (
-          <label key={name} style={{ marginLeft: 15 }}>
-            <input
-              type="checkbox"
-              checked={activeSeries.includes(name)}
-              onChange={() => toggleSeries(name)}
-            />
-            {name}
-          </label>
-        ))}
+    <div className="generate-graphs-container">
+      <div className="header-container">
+        <button onClick={() => navigate('/generateReports')}>Back</button>
       </div>
-    </>
+
+      <div className="controls">
+        <label>
+          Start Date:{' '}
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+        </label>
+        <label>
+          End Date:{' '}
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+        </label>
+        <label>
+          Fish Type:
+          <input type="text" value={fishType} onChange={(e) => setFishType(e.target.value)} />
+        </label>
+        <button onClick={fetchData}>Draw Graph</button>
+      </div>
+
+      <div>
+        {filterHeading && (
+          <h2>
+            Growth of {filterHeading.fishType} from {filterHeading.startDate} to {filterHeading.endDate}
+          </h2>
+        )}
+        <div className="scroll-container">
+          <svg ref={svgRef}></svg>
+        </div>
+      </div>
+    </div>
   )
 }

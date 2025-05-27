@@ -12,27 +12,39 @@ export const getTotalNumberOfPages = (tableName) => {
 
   return result.count
 }
-
-export const getPaginatedReadings = (page = 1, pageSize = 5) => {
+export const getPaginatedReadings = (page = 1, month = null, year = null, pageSize = 5) => {
   const offset = (page - 1) * pageSize
 
-  // 1. Get the plant_readings (paginated)
-  const readings = db
-    .prepare(
-      `
-      SELECT * FROM plant_readings
-      ORDER BY timestamp DESC
-      LIMIT ? OFFSET ?
-    `
-    )
-    .all(pageSize, offset)
+  // Base query parts
+  let whereClause = ''
+  const params = []
+
+  // Apply filter if both month and year are provided
+  if (month && year) {
+    whereClause = `WHERE strftime('%m', timestamp) = ? AND strftime('%Y', timestamp) = ?`
+    params.push(String(month).padStart(2, '0'), String(year))
+  }
+
+  // Add pagination
+  const paginationQuery = `
+    SELECT * FROM plant_readings
+    ${whereClause}
+    ORDER BY timestamp DESC
+    LIMIT ? OFFSET ?
+  `
+
+  // Add pagination params
+  params.push(pageSize, offset)
+
+  // 1. Get the plant_readings (filtered + paginated)
+  const readings = db.prepare(paginationQuery).all(...params)
 
   // 2. Get all reading_ids from current page
   const readingIds = readings.map((r) => r.id)
 
   if (readingIds.length === 0) return []
 
-  // 3. Get all related tank_snapshots, including tank name and fish type name
+  // 3. Get all related tank_snapshots
   const placeholders = readingIds.map(() => '?').join(',')
   const snapshots = db
     .prepare(
@@ -67,14 +79,15 @@ export const getPaginatedReadings = (page = 1, pageSize = 5) => {
   return result
 }
 
-export const getDataUsingDate = (start, end) => {
+export const getDataUsingDate = (start, end, orderType = "DESC") => {
+  console.log(orderType)
   // 1. Get the plant_readings within the date range
   const readings = db
     .prepare(
       `
       SELECT * FROM plant_readings
       WHERE timestamp BETWEEN ? AND ?
-      ORDER BY timestamp DESC
+      ORDER BY timestamp ${orderType}
     `
     )
     .all(start, end)
@@ -88,11 +101,13 @@ export const getDataUsingDate = (start, end) => {
   const snapshots = db
     .prepare(
       `
-      SELECT 
+           SELECT 
         ts.*, 
-        t.tank_name 
+        t.tank_name,
+        ft.fish_type_name
       FROM tank_snapshots ts
       LEFT JOIN tanks t ON ts.tank_id = t.tank_id
+      LEFT JOIN fish_types ft ON ts.fish_type_id = ft.fish_type_id
       WHERE ts.reading_id IN (${readingIds.map(() => '?').join(',')})
     `
     )
@@ -154,7 +169,6 @@ export const getRecordById = (id) => {
 
   return result
 }
-
 
 export const getTankById = (tankId) => {
   const tankInfo = db
