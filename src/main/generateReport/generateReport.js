@@ -11,7 +11,7 @@ const { dialog } = require('electron')
 export const exportToExcel = async (plantReadings, startDate, endDate) => {
   const workbook = XLSX.utils.book_new()
 
-  // 1. Flatten plant readings, exclude tank_snapshots
+  // Flatten plant readings, exclude tank_snapshots
   const readingsFlat = plantReadings.map(
     ({
       tank_snapshots,
@@ -97,7 +97,7 @@ export const exportToExcel = async (plantReadings, startDate, endDate) => {
 
   XLSX.utils.book_append_sheet(workbook, readingsSheet, 'Plant Readings')
 
-  // 2. Flatten all snapshots with reading_id and tank_name
+  // Flatten all snapshots with reading_id and tank_name
   const allSnapshots = plantReadings.flatMap((reading) =>
     (reading.tank_snapshots || []).map((snapshot) => ({
       timestamp: reading.timestamp,

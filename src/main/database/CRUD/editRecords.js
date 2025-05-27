@@ -1,7 +1,5 @@
 import { db } from '../initializeDatabase'
 
-// Helper to format current date (used for checking same-day insert)
-// const getDateOnly = () => new Date().toISOString().split('T')[0]
 export const editRecords = (readingData) => {
   const { plant_reading, tanks, plant_reading_id } = readingData
 
@@ -37,7 +35,7 @@ export const editRecords = (readingData) => {
   db.prepare('BEGIN TRANSACTION').run()
 
   try {
-    // 1. Update plant reading
+    // Update plant reading
     db.prepare(`
       UPDATE plant_readings SET
         header_pressure_in = ?, pump_1_active = ?, pump_2_active = ?, pump_3_active = ?, pump_4_active = ?,
@@ -77,7 +75,7 @@ export const editRecords = (readingData) => {
       plant_reading_id
     )
 
-    // 2. Update tank snapshots
+    // Update tank snapshots
     for (const tank of tanks) {
       if (!tank.tank_name || !tank.fish_type_name) {
         throw new Error(`Missing tank_name or fish_type_name in tank: ${JSON.stringify(tank)}`)
@@ -96,7 +94,7 @@ export const editRecords = (readingData) => {
         ? existingFish.fish_type_id
         : db.prepare(`INSERT INTO fish_types (fish_type_name) VALUES (?) RETURNING fish_type_id`).get(tank.fish_type_name).fish_type_id
 
-      // Always update snapshot if it exists
+      // update snapshot if it exists
       const existingSnapshot = db.prepare(`
         SELECT * FROM tank_snapshots
         WHERE reading_id = ? AND tank_id = ?

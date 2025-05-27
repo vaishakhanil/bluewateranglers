@@ -48,7 +48,7 @@ export const ActivateTanks = () => {
         const tankId = checkbox.id
         const newValue = !checkbox.checked
 
-        // Toggle visually (if not using controlled component)
+        // Toggle visually
         checkbox.checked = newValue
 
         // Update formData by toggling tank_active

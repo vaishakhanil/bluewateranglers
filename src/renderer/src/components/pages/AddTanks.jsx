@@ -38,11 +38,11 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
   const [isAdmin, setIsAdmin] = useState(false)
   const [loader, setLoader] = useState(false)
 
-  // Check if today is Tuesday (0 is Sunday, 1 is Monday, ..., 6 is Saturday)
+  // Check if today is Tuesday
   useEffect(() => {
     fetchUserRole()
     const today = new Date().getDay()
-    setIsTuesday(today === 2) // 2 corresponds to Tuesday
+    setIsTuesday(today === 2)
   }, [])
 
   const fetchUserRole = async () => {
@@ -106,7 +106,7 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
         name="food_size"
         value={tankData.food_size}
         onChange={handleChange}
-        disabled={!isTuesday && !isAdmin} // Disable if not Tuesday and not admin
+        disabled={!isTuesday && !isAdmin}
       >
         <option value="">Select</option>
         {foodOptions.map((opt) => (
@@ -122,7 +122,7 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
         name="fish_size"
         value={tankData.fish_size}
         onChange={handleChange}
-        disabled={!isTuesday && !isAdmin} // Disable if not Tuesday and not admin
+        disabled={!isTuesday && !isAdmin}
       />
 
       {/* Number of Fishes Input */}

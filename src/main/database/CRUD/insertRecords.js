@@ -37,7 +37,7 @@ export const insertRecords = (readingData) => {
   db.prepare('BEGIN TRANSACTION').run()
 
   try {
-    // 1. Insert the plant reading into `plant_readings` table
+    // Insert the plant reading into `plant_readings` table
     const stmt = db.prepare(`
       INSERT INTO plant_readings (
         header_pressure_in, pump_1_active, pump_2_active, pump_3_active, pump_4_active,
@@ -81,7 +81,7 @@ export const insertRecords = (readingData) => {
 
     let plantReadingId = result.id
 
-    // 2. Insert tanks if they don't already exist
+    // Insert tanks if they don't already exist
     const tankIds = []
     const fishIds = []
 
@@ -98,10 +98,10 @@ export const insertRecords = (readingData) => {
       let fishId
 
       if (existingTank) {
-        // If the tank exists, use the existing tank ID
+        // If the tank exists use the existing tank ID
         tankId = existingTank.tank_id
       } else {
-        // If the tank doesn't exist, insert it into the tanks table
+        // If the tank doesn't exist insert it into the tanks table
         const insertTankStmt = db.prepare(
           `INSERT INTO tanks (tank_name) VALUES (?) RETURNING tank_id`
         )
@@ -124,7 +124,7 @@ export const insertRecords = (readingData) => {
       fishIds.push(fishId)
     }
 
-    // 3. Insert tank snapshots for each tank
+    // Insert tank snapshots for each tank
     for (let i = 0; i < tanks.length; i++) {
       const tank = tanks[i]
       const tankId = tankIds[i]
@@ -156,7 +156,7 @@ export const insertRecords = (readingData) => {
     db.prepare('COMMIT').run()
     return { success: true, message: 'Plant reading, tanks, and snapshots inserted successfully' }
   } catch (error) {
-    // If there's an error, roll back the transaction
+    // If there's an error roll back the transaction
     db.prepare('ROLLBACK').run()
     console.error('Error during transaction:', error)
     return error
@@ -184,10 +184,10 @@ const insertTankLogic = (tankName) => {
   let tankId = null
 
   if (existingTank) {
-    // If the tank exists, use the existing tank ID
+    // If the tank exist use the existing tank ID
     tankId = existingTank.tank_id
   } else {
-    // If the tank doesn't exist, insert it into the tanks table
+    // If the tank doesn't exis insert it into the tanks table
     const insertTankStmt = db.prepare(`INSERT INTO tanks (tank_name) VALUES (?) RETURNING tank_id`)
     const insertResult = insertTankStmt.get(tankName)
     tankId = insertResult.tank_id

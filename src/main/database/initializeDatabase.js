@@ -29,7 +29,7 @@ export const initializeDatabase = () => {
     return crypto.randomUUID()
   })
 
-  // Create tables (if they don't exist already)
+  // Create tables if they dont exists
   db.exec(`
       CREATE TABLE IF NOT EXISTS plant_readings (
         id TEXT PRIMARY KEY DEFAULT (uuid()),

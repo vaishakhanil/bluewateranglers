@@ -6,3 +6,11 @@
 1. Graph based on the average weight (fish weight) and fish type (salmon, brown, rainbow etc) (y) vs weeks (x)
 
 - 2. Find how much food has been consumed based on the weight difference between the two weight (future)
+
+
+
+### TODO
+1. Create Cloud Backup
+2. Setup Autoupdate
+3. Clean up UI and code
+4. Documentation

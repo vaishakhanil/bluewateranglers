@@ -5,11 +5,11 @@ export const deleteRecords = (plantReadingId) => {
   db.prepare('BEGIN TRANSACTION').run()
 
   try {
-    // 1. Delete related tank snapshots
+    // Delete related tank snapshots
     const deleteSnapshotsStmt = db.prepare('DELETE FROM tank_snapshots WHERE reading_id = ?')
     deleteSnapshotsStmt.run(plantReadingId)
 
-    // 2. Delete the plant reading
+    // Delete the plant reading
     const deleteReadingStmt = db.prepare('DELETE FROM plant_readings WHERE id = ?')
     deleteReadingStmt.run(plantReadingId)
 

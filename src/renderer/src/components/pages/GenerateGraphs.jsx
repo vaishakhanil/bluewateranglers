@@ -169,6 +169,7 @@ export const GenerateGraphs = () => {
         <div className="scroll-container">
           <svg ref={svgRef}></svg>
         </div>
+        <span>Version 1</span>
       </div>
     </div>
   )

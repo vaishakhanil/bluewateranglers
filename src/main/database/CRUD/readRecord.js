@@ -36,15 +36,15 @@ export const getPaginatedReadings = (page = 1, month = null, year = null, pageSi
   // Add pagination params
   params.push(pageSize, offset)
 
-  // 1. Get the plant_readings (filtered + paginated)
+  // Get the plant_readings (filtered + paginated)
   const readings = db.prepare(paginationQuery).all(...params)
 
-  // 2. Get all reading_ids from current page
+  // Get all reading_ids from current page
   const readingIds = readings.map((r) => r.id)
 
   if (readingIds.length === 0) return []
 
-  // 3. Get all related tank_snapshots
+  // Get all related tank_snapshots
   const placeholders = readingIds.map(() => '?').join(',')
   const snapshots = db
     .prepare(
@@ -61,7 +61,7 @@ export const getPaginatedReadings = (page = 1, month = null, year = null, pageSi
     )
     .all(...readingIds)
 
-  // 4. Group snapshots by reading_id
+  // Group snapshots by reading_id
   const snapshotsByReading = {}
   snapshots.forEach((snapshot) => {
     if (!snapshotsByReading[snapshot.reading_id]) {
@@ -70,7 +70,7 @@ export const getPaginatedReadings = (page = 1, month = null, year = null, pageSi
     snapshotsByReading[snapshot.reading_id].push(snapshot)
   })
 
-  // 5. Attach snapshots to readings
+  // Attach snapshots to readings
   const result = readings.map((reading) => ({
     ...reading,
     tank_snapshots: snapshotsByReading[reading.id] || []
@@ -80,8 +80,7 @@ export const getPaginatedReadings = (page = 1, month = null, year = null, pageSi
 }
 
 export const getDataUsingDate = (start, end, orderType = "DESC") => {
-  console.log(orderType)
-  // 1. Get the plant_readings within the date range
+  // Get the plant_readings within the date range
   const readings = db
     .prepare(
       `
@@ -92,12 +91,12 @@ export const getDataUsingDate = (start, end, orderType = "DESC") => {
     )
     .all(start, end)
 
-  // 2. Get all reading_ids
+  // Get all reading_ids
   const readingIds = readings.map((r) => r.id)
 
   if (readingIds.length === 0) return []
 
-  // 3. Get all related tank_snapshots with tank name
+  // Get all related tank_snapshots with tank name
   const snapshots = db
     .prepare(
       `
@@ -113,7 +112,7 @@ export const getDataUsingDate = (start, end, orderType = "DESC") => {
     )
     .all(...readingIds)
 
-  // 4. Group snapshots by reading_id
+  // Group snapshots by reading_id
   const snapshotsByReading = {}
   snapshots.forEach((snapshot) => {
     if (!snapshotsByReading[snapshot.reading_id]) {
@@ -122,7 +121,7 @@ export const getDataUsingDate = (start, end, orderType = "DESC") => {
     snapshotsByReading[snapshot.reading_id].push(snapshot)
   })
 
-  // 5. Attach snapshots to readings
+  // Attach snapshots to readings
   const result = readings.map((reading) => ({
     ...reading,
     tank_snapshots: snapshotsByReading[reading.id] || []
@@ -132,7 +131,7 @@ export const getDataUsingDate = (start, end, orderType = "DESC") => {
 }
 
 export const getRecordById = (id) => {
-  // 1. Get the plant_reading by the given id
+  // Get the plant_reading by the given id
   const reading = db
     .prepare(
       `
@@ -145,7 +144,7 @@ export const getRecordById = (id) => {
   // If no record is found, return null
   if (!reading) return null
 
-  // 2. Get all related tank_snapshots with tank name and fish type name
+  // Get all related tank_snapshots with tank name and fish type name
   const snapshots = db
     .prepare(
       `
@@ -161,7 +160,7 @@ export const getRecordById = (id) => {
     )
     .all(id)
 
-  // 3. Attach snapshots to the reading
+  // Attach snapshots to the reading
   const result = {
     ...reading,
     tank_snapshots: snapshots
@@ -195,8 +194,6 @@ export const getTankById = (tankId) => {
     .all(tankId)
 
   tankInfo.fish_type_name = fishTypes
-
-  console.log(tankInfo)
 
   return {
     tank: tankInfo
