@@ -19,6 +19,8 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
   // State to store form data
   const [tankData, setTankData] = useState({
     tank_name: '',
+    fish_type_name: '',
+    number_of_fishes: 0,
     flow: false,
     clean: false,
     do_level: '',
@@ -61,6 +63,7 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
 
   // Handle form submission
   const handleSubmit = () => {
+    console.log(tankData)
     onSave(tankData)
   }
 
@@ -72,6 +75,13 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
         value={tankData.tank_name}
         onChange={handleChange}
       />
+      <FormField
+        label="FISH TYPE"
+        name="fish_type_name"
+        value={tankData.fish_type_name}
+        onChange={handleChange}
+      />
+
       <div className="form__tank-block">
         <FormField
           label="FLOW"
@@ -113,6 +123,14 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
         value={tankData.fish_size}
         onChange={handleChange}
         disabled={!isTuesday && !isAdmin} // Disable if not Tuesday and not admin
+      />
+
+      {/* Number of Fishes Input */}
+      <FormField
+        label="NUMBER OF FISHES"
+        name="number_of_fishes"
+        value={tankData.number_of_fishes}
+        onChange={handleChange}
       />
 
       <FormField label="DIET" name="diet" value={tankData.diet} onChange={handleChange} />

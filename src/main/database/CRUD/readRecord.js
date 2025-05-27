@@ -1,5 +1,18 @@
 import { db } from '../initializeDatabase'
 
+export const getTotalNumberOfPages = (tableName) => {
+  const result = db
+    .prepare(
+      `
+      SELECT COUNT(*) as count
+      FROM ${tableName}
+    `
+    )
+    .get()
+
+  return result.count
+}
+
 export const getPaginatedReadings = (page = 1, pageSize = 5) => {
   const offset = (page - 1) * pageSize
 
@@ -7,10 +20,10 @@ export const getPaginatedReadings = (page = 1, pageSize = 5) => {
   const readings = db
     .prepare(
       `
-    SELECT * FROM plant_readings
-    ORDER BY timestamp DESC
-    LIMIT ? OFFSET ?
-  `
+      SELECT * FROM plant_readings
+      ORDER BY timestamp DESC
+      LIMIT ? OFFSET ?
+    `
     )
     .all(pageSize, offset)
 
@@ -19,17 +32,20 @@ export const getPaginatedReadings = (page = 1, pageSize = 5) => {
 
   if (readingIds.length === 0) return []
 
-  // 3. Get all related tank_snapshots with tank name
+  // 3. Get all related tank_snapshots, including tank name and fish type name
+  const placeholders = readingIds.map(() => '?').join(',')
   const snapshots = db
     .prepare(
       `
-    SELECT 
-      ts.*, 
-      t.tank_name 
-    FROM tank_snapshots ts
-    LEFT JOIN tanks t ON ts.tank_id = t.tank_id
-    WHERE ts.reading_id IN (${readingIds.map(() => '?').join(',')})
-  `
+      SELECT 
+        ts.*, 
+        t.tank_name,
+        ft.fish_type_name
+      FROM tank_snapshots ts
+      LEFT JOIN tanks t ON ts.tank_id = t.tank_id
+      LEFT JOIN fish_types ft ON ts.fish_type_id = ft.fish_type_id
+      WHERE ts.reading_id IN (${placeholders})
+    `
     )
     .all(...readingIds)
 
@@ -111,17 +127,20 @@ export const getRecordById = (id) => {
     )
     .get(id)
 
-  if (!reading) return null // If no record is found, return null
+  // If no record is found, return null
+  if (!reading) return null
 
-  // 2. Get all related tank_snapshots with tank name for the given reading_id
+  // 2. Get all related tank_snapshots with tank name and fish type name
   const snapshots = db
     .prepare(
       `
       SELECT 
         ts.*, 
-        t.tank_name 
+        t.tank_name,
+        ft.fish_type_name
       FROM tank_snapshots ts
       LEFT JOIN tanks t ON ts.tank_id = t.tank_id
+      LEFT JOIN fish_types ft ON ts.fish_type_id = ft.fish_type_id
       WHERE ts.reading_id = ?
       `
     )
@@ -136,12 +155,40 @@ export const getRecordById = (id) => {
   return result
 }
 
-export const getPreviousWeekTankInfo = (tankName) => {
-  console.log(tankName)
-}
 
+export const getTankById = (tankId) => {
+  const tankInfo = db
+    .prepare(
+      `
+      SELECT * FROM tanks
+      WHERE tank_id = ?
+    `
+    )
+    .get(tankId)
+
+  if (!tankInfo) return null
+
+  // Get distinct fish types associated with this tank via tank_snapshots
+  const fishTypes = db
+    .prepare(
+      `
+      SELECT DISTINCT ft.fish_type_id, ft.fish_type_name
+      FROM tank_snapshots ts
+      JOIN fish_types ft ON ts.fish_type_id = ft.fish_type_id
+      WHERE ts.tank_id = ?
+    `
+    )
+    .all(tankId)
+
+  tankInfo.fish_type_name = fishTypes
+
+  console.log(tankInfo)
+
+  return {
+    tank: tankInfo
+  }
+}
 export const getAllTankInfo = () => {
-  console.log('hit')
   const AllTanks = db.prepare('SELECT * FROM TANKS').all()
   return AllTanks
 }

@@ -9,6 +9,14 @@ const Input = styled.input`
   background-color: var(--ba-button-white);
   color: var(--ba-text-black);
 
+  &[type='checkbox'] {
+    width: 24px;
+    height: 24px;
+    accent-color: #007bff; /* optional: modern browsers */
+    cursor: pointer;
+    margin-right: 8px;
+  }
+
   &:disabled {
     background-color: var(--ba-input-locked);
     cursor: not-allowed;

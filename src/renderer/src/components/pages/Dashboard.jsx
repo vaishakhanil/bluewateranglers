@@ -7,12 +7,14 @@ import { Loader } from '../organisms/Loader/Loader'
 import { Tabs, TabList, Tab, TabPanel } from 'react-tabs'
 import 'react-tabs/style/react-tabs.css'
 import TankSnapshotViewer from './TankSnapshots'
+import { OperationsMenu } from '../organisms/OperationsMenu/OperationsMenu'
 
 export const Dashboard = () => {
   const navigate = useNavigate()
   const [isAdmin, setIsAdmin] = useState(false)
   const [loader, setLoader] = useState(false)
   const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const [plantReadings, setPlantReadings] = useState([])
   const [snapshots, setSnapshots] = useState([])
 
@@ -23,7 +25,13 @@ export const Dashboard = () => {
 
   useEffect(() => {
     getData()
-  }, [page])
+    getTotalPages()
+  }, [page, totalPages])
+
+  const getTotalPages = async () => {
+    const totalPages = await window.electron.api.getTotalNumberOfPages('plant_readings')
+    setTotalPages(Math.ceil(totalPages / 5))
+  }
 
   const getData = async () => {
     const data = await window.electron.api.getPlantReadings(page)
@@ -57,9 +65,13 @@ export const Dashboard = () => {
 
   const handlePageChange = (e) => {
     const val = parseInt(e.target.value)
-    if (!isNaN(val) && val > 0) {
+    if (!isNaN(val) && val > 0 && val <= totalPages) {
       setPage(val)
     }
+  }
+
+  const SearchResults = (data) => {
+    console.log(data)
   }
 
   const handleNext = () => setPage((p) => p + 1)
@@ -78,6 +90,7 @@ export const Dashboard = () => {
          RENDER THE DATA
       */}
       <div className="center_page">
+        <OperationsMenu SendSearchValueToParent={SearchResults} />
         <div className="tab-container">
           <Tabs className={'tab-custom'}>
             <TabList>
@@ -338,7 +351,10 @@ export const Dashboard = () => {
               onChange={handlePageChange}
               style={{ width: 60, margin: '0 10px' }}
             />
-            <Button onClick={handleNext}>Next &#8594;</Button>
+            <span>/ {totalPages} </span>
+            <Button disabled={page === totalPages} onClick={handleNext}>
+              Next &#8594;
+            </Button>
           </div>
         </div>
       </div>

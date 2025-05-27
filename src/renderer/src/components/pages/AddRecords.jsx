@@ -108,6 +108,7 @@ export const AddRecords = () => {
 
     try {
       if (id) {
+        payload.plant_reading_id = id
         const result = await window.electron.api.editRecords(payload)
         navigate('/')
         console.log(result)

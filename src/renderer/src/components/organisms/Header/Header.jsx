@@ -19,6 +19,7 @@ export const Header = ({ displayMenus = true, displayReportMenu = false, isAdmin
           <Button onClick={() => navigate('/addRecords')} variant={'regular'}>
             ADD / UPDATE DAILY REPORTS
           </Button>
+
           {isAdmin && (
             <Button onClick={() => navigate('/generateReports')} variant={'regular'}>
               GENERATE REPORTS

@@ -4,7 +4,9 @@ import {
   LoginPage,
   GenerateReports,
   AddRecords,
-  ActivateTanks
+  ActivateTanks,
+  GenerateGraphs,
+  EditTanks
 } from './components/pages'
 
 function App() {
@@ -17,6 +19,8 @@ function App() {
         <Route path="/addRecords" element={<AddRecords />} />
         <Route path="/addRecords/:id" element={<AddRecords />} />
         <Route path="/activateTanks" element={<ActivateTanks />} />
+        <Route path="/generateGraphs" element={<GenerateGraphs />} />
+        <Route path="/editTanks/:id" element={<EditTanks />} />
       </Routes>
     </Router>
   )

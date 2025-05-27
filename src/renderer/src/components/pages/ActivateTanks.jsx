@@ -7,17 +7,27 @@ export const ActivateTanks = () => {
   const navigate = useNavigate()
   const [tankInfo, setTankInfo] = useState([])
   const [formData, setFormData] = useState([])
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     const loadData = async () => {
       const data = await window.electron.api.getAllTankInfo()
       if (data) {
-        console.log(data)
         setTankInfo(data)
+        fetchUserRole()
       }
     }
     loadData()
   }, [])
+
+  const fetchUserRole = async () => {
+    const role = await window.electron.auth.getRole()
+    if (role === 'admin') setIsAdmin(true)
+  }
+
+  const handleEdit = (id) => {
+    navigate(`/editTanks/${id}`)
+  }
 
   const renderFormData = () => {
     if (tankInfo.length === 0) {
@@ -76,13 +86,21 @@ export const ActivateTanks = () => {
       <tr key={tankData.tank_id}>
         <td>{tankData.tank_name}</td>
         <td id={tankData.tank_id} onClick={handleToggle}>
-          <input
+          <Input
             id={tankData.tank_id}
             type="checkbox"
             checked={tankData.tank_active}
             onChange={handleToggle}
           />
         </td>
+        {isAdmin && (
+          <td>
+            <Button variant={'primary'} onClick={() => handleEdit(tankData.tank_id)}>
+              {' '}
+              Edit{' '}
+            </Button>
+          </td>
+        )}
       </tr>
     ))
   }

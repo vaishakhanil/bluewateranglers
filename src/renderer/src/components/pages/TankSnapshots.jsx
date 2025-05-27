@@ -42,7 +42,6 @@ export const TankSnapshotViewer = (data = []) => {
   )
 
   const handleEdit = (id) => {
-    console.log(id)
     navigate(`/addRecords/${id}`)
   }
 
@@ -65,9 +64,11 @@ export const TankSnapshotViewer = (data = []) => {
         <thead>
           <tr>
             <th>Timestamp</th>
+            <th>Fish Type</th>
             <th>Flow</th>
             <th>Clean</th>
             <th>DO Level</th>
+            <th>Number Of Fishes</th>
             <th>Food Size</th>
             <th>Fish Size</th>
             <th>Diet</th>
@@ -80,6 +81,7 @@ export const TankSnapshotViewer = (data = []) => {
           {filteredSnapshots.map((snap) => (
             <tr key={snap.snapshot_id}>
               <td>{snap.timestamp}</td>
+              <td>{snap.fish_type_name}</td>
               <td className={snap.flow ? 'active-table-cell' : 'inactive-table-cell'}>
                 {snap.flow ? 'True' : 'False'}
               </td>
@@ -87,6 +89,7 @@ export const TankSnapshotViewer = (data = []) => {
                 {snap.clean ? 'True' : 'False'}
               </td>
               <td>{snap.do_level}</td>
+              <td>{snap.number_of_fishes}</td>
               <td>{snap.food_size}</td>
               <td>{snap.fish_size}</td>
               <td>{snap.diet}</td>

@@ -1,13 +1,11 @@
 import { db } from '../initializeDatabase'
 
 // Helper to format current date (used for checking same-day insert)
-const getDateOnly = () => new Date().toISOString().split('T')[0]
-
+// const getDateOnly = () => new Date().toISOString().split('T')[0]
 export const editRecords = (readingData) => {
-  const { plant_reading, tanks } = readingData
+  const { plant_reading, tanks, plant_reading_id } = readingData
 
   const {
-    id, // Expecting 'id' to be part of plant_reading object
     header_pressure_in,
     pump_1_active,
     pump_2_active,
@@ -36,24 +34,11 @@ export const editRecords = (readingData) => {
     operator_name
   } = plant_reading
 
-  const currentDate = getDateOnly()
-
   db.prepare('BEGIN TRANSACTION').run()
 
   try {
-    // 1. Ensure the record exists based on provided 'id' (we're updating here)
-    const existingReadingStmt = db.prepare(`
-      SELECT id FROM plant_readings
-      WHERE id = ?
-    `)
-    const existingReading = existingReadingStmt.get(id)
-
-    if (!existingReading) {
-      throw new Error('Record not found for the provided ID')
-    }
-
-    // 2. Update existing reading with provided data
-    const updateStmt = db.prepare(`
+    // 1. Update plant reading
+    db.prepare(`
       UPDATE plant_readings SET
         header_pressure_in = ?, pump_1_active = ?, pump_2_active = ?, pump_3_active = ?, pump_4_active = ?,
         east_pump_active = ?, east_blower_north_active = ?, west_blower_active = ?, east_blower_south_active = ?,
@@ -62,9 +47,7 @@ export const editRecords = (readingData) => {
         generator_autostart = ?, generator_hours = ?, generator_minutes = ?, fuel_tank_level = ?,
         transfer_switch_active = ?, generator_at_rest = ?, plc_active = ?, alarm_activated = ?, operator_name = ?
       WHERE id = ?
-    `)
-
-    updateStmt.run(
+    `).run(
       header_pressure_in,
       pump_1_active,
       pump_2_active,
@@ -91,87 +74,103 @@ export const editRecords = (readingData) => {
       plc_active,
       alarm_activated,
       operator_name,
-      id // ID to match the record
+      plant_reading_id
     )
 
-    // 3. Handle tanks and snapshots
-    // Get the current snapshots for the reading (before deleting any)
-    const currentSnapshotsStmt = db.prepare(`
-      SELECT tank_id FROM tank_snapshots WHERE reading_id = ?
-    `)
-    const currentSnapshots = currentSnapshotsStmt.all(id)
-
-    const currentTankIds = currentSnapshots.map((snapshot) => snapshot.tank_id)
-    const updatedTankIds = tanks.map((tank) => {
-      // Insert tank if it doesn't exist
-      const existingTankStmt = db.prepare(`SELECT tank_id FROM tanks WHERE tank_name = ?`)
-      const existingTank = existingTankStmt.get(tank.tank_name)
-
-      let tankId
-
-      if (existingTank) {
-        tankId = existingTank.tank_id
-      } else {
-        const insertTankStmt = db.prepare(
-          `INSERT INTO tanks (tank_name) VALUES (?) RETURNING tank_id`
-        )
-        const insertTank = insertTankStmt.get(tank.tank_name)
-        tankId = insertTank.tank_id
+    // 2. Update tank snapshots
+    for (const tank of tanks) {
+      if (!tank.tank_name || !tank.fish_type_name) {
+        throw new Error(`Missing tank_name or fish_type_name in tank: ${JSON.stringify(tank)}`)
       }
 
-      return tankId
-    })
+      // Ensure tank exists
+      const existingTank = db.prepare(`SELECT tank_id FROM tanks WHERE tank_name = ?`).get(tank.tank_name)
+      const tankId = existingTank
+        ? existingTank.tank_id
+        : db.prepare(`INSERT INTO tanks (tank_name) VALUES (?) RETURNING tank_id`).get(tank.tank_name).tank_id
 
-    // 4. Delete snapshots for tanks no longer associated with the current reading
-    const tanksToDelete = currentTankIds.filter((tankId) => !updatedTankIds.includes(tankId))
+      // Ensure fish type exists
+      const existingFish = db.prepare(`SELECT fish_type_id FROM fish_types WHERE fish_type_name = ?`).get(tank.fish_type_name)
+      
+      const fishId = existingFish
+        ? existingFish.fish_type_id
+        : db.prepare(`INSERT INTO fish_types (fish_type_name) VALUES (?) RETURNING fish_type_id`).get(tank.fish_type_name).fish_type_id
 
-    if (tanksToDelete.length > 0) {
-      const deleteSnapshotStmt = db.prepare(`
-        DELETE FROM tank_snapshots
-        WHERE reading_id = ? AND tank_id IN (${tanksToDelete.map(() => '?').join(',')})
-      `)
-      deleteSnapshotStmt.run([id, ...tanksToDelete])
-    }
+      // Always update snapshot if it exists
+      const existingSnapshot = db.prepare(`
+        SELECT * FROM tank_snapshots
+        WHERE reading_id = ? AND tank_id = ?
+      `).get(plant_reading_id, tankId)
 
-    // 5. Insert or update the tank snapshots
-    for (let tank of tanks) {
-      const tankId = updatedTankIds.find((tid) => tid === tank.tank_id) // Find the correct tank_id
-
-      // UPSERT tank snapshot (based on reading_id + tank_id)
-      const upsertSnapshotStmt = db.prepare(`
-        INSERT INTO tank_snapshots (
-          reading_id, tank_id, flow, clean, do_level, food_size, fish_size, diet, diet_type, mort
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT(reading_id, tank_id) DO UPDATE SET
-          flow = excluded.flow,
-          clean = excluded.clean,
-          do_level = excluded.do_level,
-          food_size = excluded.food_size,
-          fish_size = excluded.fish_size,
-          diet = excluded.diet,
-          diet_type = excluded.diet_type,
-          mort = excluded.mort
-      `)
-
-      upsertSnapshotStmt.run(
-        id, // Use the provided reading ID here for the update
-        tankId,
-        tank.flow || 0,
-        tank.clean || 0,
-        tank.do_level || 0,
-        tank.food_size || 0.0,
-        tank.fish_size || 0.0,
-        tank.diet || 0.0,
-        tank.diet_type || 'L',
-        tank.mort || 0
-      )
+      if (existingSnapshot) {
+        db.prepare(`
+          UPDATE tank_snapshots SET
+            fish_type_id = ?, number_of_fishes = ?, flow = ?, clean = ?, do_level = ?,
+            food_size = ?, fish_size = ?, diet = ?, diet_type = ?, mort = ?
+          WHERE reading_id = ? AND tank_id = ?
+        `).run(
+          fishId,
+          tank.number_of_fishes || 0,
+          tank.flow || 0,
+          tank.clean || 0,
+          tank.do_level || 0,
+          tank.food_size || 0.0,
+          tank.fish_size || 0.0,
+          tank.diet || 0.0,
+          tank.diet_type || 'L',
+          tank.mort || 0,
+          plant_reading_id,
+          tankId
+        )
+      } else {
+        db.prepare(`
+          INSERT INTO tank_snapshots (
+            reading_id, tank_id, fish_type_id, number_of_fishes, flow, clean, do_level,
+            food_size, fish_size, diet, diet_type, mort
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          plant_reading_id,
+          tankId,
+          fishId,
+          tank.number_of_fishes || 0,
+          tank.flow || 0,
+          tank.clean || 0,
+          tank.do_level || 0,
+          tank.food_size || 0.0,
+          tank.fish_size || 0.0,
+          tank.diet || 0.0,
+          tank.diet_type || 'L',
+          tank.mort || 0
+        )
+      }
     }
 
     db.prepare('COMMIT').run()
-    return { success: true, message: 'Updated plant reading and tank data successfully.' }
+    return { success: true, message: 'Plant reading and tank data updated successfully' }
   } catch (error) {
     db.prepare('ROLLBACK').run()
-    console.error('Transaction failed:', error)
+    console.error('Error during update transaction:', error)
+    return { success: false, message: 'Update failed', error }
+  }
+}
+
+
+export const updateTankInfo = (tankData) => {
+  try {
+    db.prepare('BEGIN TRANSACTION').run()
+
+    const updateStmt = db.prepare(`
+      UPDATE tanks SET
+        tank_name = ?, tank_active = ?
+      WHERE id = ?
+    `)
+
+    updateStmt.run(tankData.tank_name, tankData.tank_active, tankData.tank_id)
+    db.prepare('COMMIT').run()
+    return { success: true, message: 'Updated tank info successfully.' }
+  } catch (error) {
+    db.prepare('ROLLBACK').run()
+
     return { success: false, error: error.message }
   }
 }

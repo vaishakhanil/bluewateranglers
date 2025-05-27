@@ -19,9 +19,6 @@ const dbFilePath = path.join(mainDbPath, 'plantDatabase.sqlite')
   }
 })
 
-// Get a writable path like userData
-// const dbPath = path.join(app.getPath('userData'), 'plantDatabase.sqlite')
-
 // Create or open the SQLite database
 export const db = new Database(dbFilePath)
 
@@ -88,7 +85,7 @@ export const initializeDatabase = () => {
         food_size REAL DEFAULT 0.0,
         fish_size REAL DEFAULT 0.00,
         diet REAL DEFAULT 0.00,
-        diet_type TEXT CHECK (diet_type IN ('L', 'gm')),
+        diet_type TEXT NOT NULL CHECK (diet_type IN ('L', 'gm')),
         mort INTEGER DEFAULT 0,
         FOREIGN KEY (reading_id) REFERENCES plant_readings(id) ON DELETE CASCADE,
         FOREIGN KEY (tank_id) REFERENCES tanks(tank_id) ON DELETE CASCADE,
@@ -96,8 +93,6 @@ export const initializeDatabase = () => {
       );
 
       CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_reading_tank ON tank_snapshots(reading_id, tank_id);
+      PRAGMA foreign_keys = ON;
     `)
-
-  const PRAGMA_ON = db.pragma('foreign_keys = ON')
-  console.log(PRAGMA_ON)
 }

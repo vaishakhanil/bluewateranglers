@@ -1,12 +1,13 @@
 import { insertRecords, insertTanks } from './insertRecords'
-import { editRecords } from './editRecords'
+import { editRecords, updateTankInfo } from './editRecords'
 import { deleteRecords } from './deleteRecords'
 import {
   getPaginatedReadings,
   getDataUsingDate,
   getRecordById,
-  getPreviousWeekTankInfo,
-  getAllTankInfo
+  getAllTankInfo,
+  getTankById,
+  getTotalNumberOfPages
 } from './readRecord'
 
 export {
@@ -17,6 +18,8 @@ export {
   getPaginatedReadings,
   getDataUsingDate,
   getRecordById,
-  getPreviousWeekTankInfo,
-  getAllTankInfo
+  getAllTankInfo,
+  getTankById,
+  updateTankInfo,
+  getTotalNumberOfPages
 }

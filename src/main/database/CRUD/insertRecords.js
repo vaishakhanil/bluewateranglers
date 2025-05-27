@@ -83,12 +83,19 @@ export const insertRecords = (readingData) => {
 
     // 2. Insert tanks if they don't already exist
     const tankIds = []
+    const fishIds = []
 
     for (let tank of tanks) {
       // Check if the tank already exists
       const checkStmt = db.prepare(`SELECT tank_id FROM tanks WHERE tank_name = ?`)
       const existingTank = checkStmt.get(tank.tank_name)
       let tankId
+
+      const checkFishStmt = db.prepare(
+        `SELECT fish_type_id from fish_types WHERE fish_type_name = ?`
+      )
+      const existingFish = checkFishStmt.get(tank.fish_type_name)
+      let fishId
 
       if (existingTank) {
         // If the tank exists, use the existing tank ID
@@ -103,22 +110,37 @@ export const insertRecords = (readingData) => {
       }
 
       tankIds.push(tankId)
+
+      if (existingFish) {
+        fishId = existingFish.fish_type_id
+      } else {
+        const insertNewFishStmt = db.prepare(
+          `INSERT INTO fish_types (fish_type_name) VALUES (?) RETURNING fish_type_id`
+        )
+        const insertFishResult = insertNewFishStmt.get(tank.fish_type_name)
+        fishId = insertFishResult.fish_type_id
+      }
+
+      fishIds.push(fishId)
     }
 
     // 3. Insert tank snapshots for each tank
     for (let i = 0; i < tanks.length; i++) {
       const tank = tanks[i]
       const tankId = tankIds[i]
+      const fishId = fishIds[i]
 
       const insertSnapshotStmt = db.prepare(`
         INSERT INTO tank_snapshots (
-          reading_id, tank_id, flow, clean, do_level, food_size, fish_size, diet, diet_type, mort
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          reading_id, tank_id, fish_type_id, number_of_fishes, flow, clean, do_level, food_size, fish_size, diet, diet_type, mort
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `)
 
       insertSnapshotStmt.run(
         plantReadingId,
         tankId,
+        fishId,
+        tank.number_of_fishes || 0,
         tank.flow || 0,
         tank.clean || 0,
         tank.do_level || 0,
@@ -172,4 +194,23 @@ const insertTankLogic = (tankName) => {
   }
 
   return tankId
+}
+
+export const insertFishTypes = (fishName) => {
+  db.prepare('BEGIN TRANSACTION').run()
+
+  let fishId = null
+
+  try {
+    const insertNewFishStmt = db.prepare(
+      `INSERT INTO fish_types (fish_type_name) VALUES (?) RETURNING fish_type_id`
+    )
+    const insertFishResult = insertNewFishStmt.get(fishName)
+    fishId = insertFishResult.fish_type_id
+    if (!fishId) throw new Error('Fish ID is null')
+    return { success: true, message: `${fishName} has been added to the database` }
+  } catch (error) {
+    db.prepare('ROLLBACK').run()
+    return error
+  }
 }

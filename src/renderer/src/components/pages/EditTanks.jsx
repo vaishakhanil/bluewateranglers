@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { FormField } from '../molecules'
 import { Button } from '../atoms'
@@ -7,25 +7,34 @@ export const EditTanks = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const [formData, setFormData] = useState({
+    tank_id: '',
     tank_name: '',
     tank_active: false
   })
 
   useEffect(() => {
-    if(id) {
-        const fetchTankData = async () => {
-            // const data = await setFormData
-        } 
+    if (id) {
+      const fetchTankData = async () => {
+        const data = await window.electron.api.getTankById(id)
+        if (data) {
+          setFormData(data)
+        }
+      }
+
+      fetchTankData()
     }
-  }, [])
+  }, [id])
 
   const submitTanks = () => {
-    console.log('active')
+    console.log('Submit tanks')
   }
 
-  const handleChange = (event) => {
-    const { tankName } = event.target
-    console.log(tankName)
+  const handleChange = (e) => {
+    const { name, type, value, checked } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }))
   }
 
   return (
@@ -40,14 +49,14 @@ export const EditTanks = () => {
         />
         <FormField
           label="Activate Tank"
-          name="activateTank"
+          name="tank_active"
           type="checkbox"
           value={formData.tank_active}
           onChange={handleChange}
         />
         <div>
           <Button onClick={submitTanks}>Save</Button>
-          <Button onClick={() => navigate('/addRecords')}>Cancel</Button>
+          <Button onClick={() => navigate('/activateTanks')}>Cancel</Button>
         </div>
       </div>
     </div>

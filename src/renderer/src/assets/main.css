@@ -59,9 +59,9 @@ body {
   font-weight: bold;
 }
 
-.form-field-container {
+/* .form-field-container {
   margin: 5px;
-}
+} */
 
 .react-tabs__tab-list,
 td,
@@ -125,7 +125,7 @@ tr:hover {
 
 .add-record-container {
   display: flex;
-  margin: 20px;
+  /* margin: 20px; */
 }
 
 .add-records-container {
@@ -167,6 +167,10 @@ tr:hover {
   /* justify-content: space-evenly; */
   align-items: center;
   margin-bottom: 10;
+}
+
+.tank_table th, td{
+  padding: 5px;
 }
 
 .footer .pagination {

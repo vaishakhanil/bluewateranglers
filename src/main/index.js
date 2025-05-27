@@ -10,9 +10,11 @@ import {
   getPaginatedReadings,
   getDataUsingDate,
   getRecordById,
-  getPreviousWeekTankInfo,
   insertTanks,
-  getAllTankInfo
+  getAllTankInfo,
+  getTankById,
+  updateTankInfo,
+  getTotalNumberOfPages
 } from './database/CRUD'
 import { ipcHandleAuth } from './auth/auth'
 import { setRole } from './auth/store'
@@ -51,6 +53,16 @@ function createWindow() {
 }
 
 function handleIPC() {
+  ipcMain.handle('get-total-number-of-pages', async (event, tableName) => {
+    try {
+      const result = await getTotalNumberOfPages(tableName)
+      return result
+    } catch (error) {
+      console.error('Error reading total number of pages: ', error)
+      throw error
+    }
+  })
+
   // Listen for the 'insert-records' event
   ipcMain.handle('insert-records', async (event, readingData) => {
     try {
@@ -114,8 +126,8 @@ function handleIPC() {
     return result
   })
 
-  ipcMain.handle('get-previous-week-tank-info', async (event, tankName) => {
-    const result = getPreviousWeekTankInfo(tankName)
+  ipcMain.handle('get-tank-by-id', async (event, tankId) => {
+    const result = getTankById(tankId)
     return result
   })
 
@@ -124,6 +136,10 @@ function handleIPC() {
     return result
   })
 
+  ipcMain.handle('update-tank-info', async (event, tankData) => {
+    const result = updateTankInfo(tankData)
+    return result
+  })
 }
 
 app.whenReady().then(() => {

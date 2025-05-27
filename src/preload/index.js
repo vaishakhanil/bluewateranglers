@@ -28,11 +28,17 @@ contextBridge.exposeInMainWorld('electron', {
     getRecordById: async (id) => {
       return ipcRenderer.invoke('get-record-by-id', id)
     },
-    getPreviousWeekTankInfo: async (tankName) => {
-      return ipcRenderer.invoke('get-previous-week-tank-info', tankName)
+    getTankById: async (tankId) => {
+      return ipcRenderer.invoke('get-tank-by-id', tankId)
     },
     getAllTankInfo: async () => {
       return ipcRenderer.invoke('get-all-tank-info')
+    },
+    getTotalNumberOfPages: async (tankName) => {
+      return ipcRenderer.invoke('get-total-number-of-pages', tankName)
+    },
+    updateTankInfo: async (tankData) => {
+      return ipcRenderer.invoke('update-tank-info', tankData)
     }
   },
   auth: {
