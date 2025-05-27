@@ -15,7 +15,6 @@ const dbFilePath = path.join(mainDbPath, 'plantDatabase.sqlite')
 ;[mainDbPath, monthlyBackupPath, dailyBackupPath].forEach((dir) => {
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true })
-    console.log('Created')
   }
 })
 

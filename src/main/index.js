@@ -107,7 +107,6 @@ function handleIPC() {
   // Listen for the 'insert-records' event
   ipcMain.handle('insert-records', async (event, readingData) => {
     try {
-      console.log(readingData)
       const result = await insertRecords(readingData)
       return result
     } catch (error) {
