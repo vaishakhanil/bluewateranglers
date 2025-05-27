@@ -11,7 +11,7 @@
 
 ### TODO
 1. Create Cloud Backup
-2. Setup Autoupdate
+2. Setup Autoupdate -- Partially completed
 3. Clean up UI and code
 4. Documentation
 
