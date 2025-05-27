@@ -20,6 +20,44 @@ import { ipcHandleAuth } from './auth/auth'
 import { setRole } from './auth/store'
 import { exportToExcel } from './generateReport/generateReport'
 
+
+import { autoUpdater } from 'electron-updater';
+
+function setupAutoUpdater(mainWindow) {
+  autoUpdater.checkForUpdatesAndNotify();
+
+  autoUpdater.on('checking-for-update', () => {
+    console.log('Checking for update...');
+  });
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('Update available:', info);
+    mainWindow.webContents.send('update_available');
+  });
+
+  autoUpdater.on('update-not-available', (info) => {
+    console.log('Update not available:', info);
+    mainWindow.webContents.send('update_not_available');
+  });
+
+  autoUpdater.on('error', (err) => {
+    console.error('Error in auto-updater:', err);
+    mainWindow.webContents.send('update_error', err);
+  });
+
+  autoUpdater.on('download-progress', (progressObj) => {
+    mainWindow.webContents.send('download_progress', progressObj);
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    mainWindow.webContents.send('update_downloaded');
+    // Optionally restart automatically:
+    // autoUpdater.quitAndInstall();
+  });
+}
+
+
+
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -50,6 +88,8 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+   return mainWindow
 }
 
 function handleIPC() {
@@ -161,13 +201,16 @@ app.whenReady().then(() => {
   initializeDatabase()
 
   // Display Window
-  createWindow()
+  const mainWindow = createWindow()
 
   // Handle Database
   handleIPC()
 
   // Handle Authentication
   ipcHandleAuth()
+
+  // Auto Update
+  setupAutoUpdater(mainWindow)
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
