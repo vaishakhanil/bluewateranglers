@@ -163,33 +163,41 @@ export const insertRecords = (readingData) => {
   }
 }
 
-export const insertTanks = (tankName) => {
-  db.prepare('BEGIN TRANSACTION').run()
-  let tankId = null
+export const insertTanks = (tankName, tankActive) => {
   try {
-    tankId = insertTankLogic(tankName)
+    db.prepare('BEGIN TRANSACTION').run() // Start transaction at the beginning
+
+    let tankId = insertTankLogic(tankName, tankActive)
+
     if (!tankId) throw new Error('Tank ID is null')
+
+    db.prepare('COMMIT').run() // Commit the transaction after insertion
+
     return { success: true, message: 'Tank Name inserted successfully' }
   } catch (error) {
-    db.prepare('ROLLBACK').run()
+    db.prepare('ROLLBACK').run() // Rollback on failure
+
     console.error('Error during transaction:', error)
-    return error
+    return { success: false, message: error.message }
   }
 }
 
-const insertTankLogic = (tankName) => {
-  // Check if the tank already exists
-  const checkStmt = db.prepare(`SELECT tank_id FROM tanks WHERE tank_name = ?`)
+const insertTankLogic = (tankName, tankActive) => {
+  const checkStmt = db.prepare('SELECT tank_id FROM tanks WHERE tank_name = ?')
   const existingTank = checkStmt.get(tankName)
   let tankId = null
 
   if (existingTank) {
-    // If the tank exist use the existing tank ID
+    // If the tank exists, update it
     tankId = existingTank.tank_id
+    const updateTankStmt = db.prepare('UPDATE tanks SET tank_active = ? WHERE tank_id = ?')
+    updateTankStmt.run(tankActive, tankId)
   } else {
-    // If the tank doesn't exis insert it into the tanks table
-    const insertTankStmt = db.prepare(`INSERT INTO tanks (tank_name) VALUES (?) RETURNING tank_id`)
-    const insertResult = insertTankStmt.get(tankName)
+    // If the tank doesn't exist, insert it
+    const insertTankStmt = db.prepare(
+      'INSERT INTO tanks (tank_name, tank_active) VALUES (?, ?) RETURNING tank_id'
+    )
+    const insertResult = insertTankStmt.get(tankName, tankActive)
     tankId = insertResult.tank_id
   }
 

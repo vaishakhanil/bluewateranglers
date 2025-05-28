@@ -169,7 +169,8 @@ tr:hover {
   margin-bottom: 10;
 }
 
-.tank_table th, td{
+.tank_table th,
+td {
   padding: 5px;
 }
 
@@ -178,8 +179,8 @@ tr:hover {
 }
 
 .chart-container {
-  width: 100%;           /* full width */
-  overflow-x: auto;      /* horizontal scroll if needed */
+  width: 100%; /* full width */
+  overflow-x: auto; /* horizontal scroll if needed */
   /* optional: fixed height or min-height */
   height: 450px;
   border: 1px solid #ccc; /* just to visualize */
@@ -197,7 +198,6 @@ tr:hover {
   font-size: 14px;
   z-index: 1000;
 }
-
 
 /* MEDIUM SCREENS */
 @media (max-width: 1200px) {

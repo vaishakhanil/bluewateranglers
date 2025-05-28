@@ -79,7 +79,7 @@ export const getPaginatedReadings = (page = 1, month = null, year = null, pageSi
   return result
 }
 
-export const getDataUsingDate = (start, end, orderType = "DESC") => {
+export const getDataUsingDate = (start, end, orderType = 'DESC') => {
   // Get the plant_readings within the date range
   const readings = db
     .prepare(

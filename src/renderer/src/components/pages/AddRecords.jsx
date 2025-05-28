@@ -10,11 +10,9 @@ export const AddRecords = () => {
   const { id } = useParams()
   const today = new Date().toLocaleDateString('en-GB') // DD/MM/YYYY
 
-  
   const [tanks, setTanks] = useState([])
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editIndex, setEditIndex] = useState(null)
-
 
   const [formData, setFormData] = useState({
     header_pressure_in: '',
@@ -103,7 +101,6 @@ export const AddRecords = () => {
   }
 
   const handleSubmit = async () => {
-
     formData.tank_snapshots = tanks
     const payload = {
       plant_reading: normalizeValues(formData),

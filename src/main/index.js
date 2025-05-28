@@ -118,9 +118,9 @@ function handleIPC() {
     }
   })
 
-  ipcMain.handle('insert-tanks', async (event, tankName) => {
+  ipcMain.handle('insert-tanks', async (event, tankName, tankActive) => {
     try {
-      const result = await insertTanks(tankName)
+      const result = await insertTanks(tankName, tankActive)
       return result
     } catch (error) {
       console.error('Error inserting tank name: ', error)

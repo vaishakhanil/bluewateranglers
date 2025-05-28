@@ -91,19 +91,19 @@ export const GenerateGraphs = () => {
       .attr('transform', 'rotate(-45)')
       .style('text-anchor', 'end')
 
-    g.append('g')
-      .call(d3.axisLeft(y))
-      .selectAll('text')
-      .style('font-size', '14px')
+    g.append('g').call(d3.axisLeft(y)).selectAll('text').style('font-size', '14px')
 
     g.append('path')
       .datum(weightPerWeek)
       .attr('fill', 'none')
       .attr('stroke', '#ff6600')
       .attr('stroke-width', 2)
-      .attr('d', d3.line()
-        .x((d) => x(d.week))
-        .y((d) => y(d.totalWeight))
+      .attr(
+        'd',
+        d3
+          .line()
+          .x((d) => x(d.week))
+          .y((d) => y(d.totalWeight))
       )
 
     g.selectAll('circle')
@@ -163,7 +163,8 @@ export const GenerateGraphs = () => {
       <div>
         {filterHeading && (
           <h2>
-            Growth of {filterHeading.fishType} from {filterHeading.startDate} to {filterHeading.endDate}
+            Growth of {filterHeading.fishType} from {filterHeading.startDate} to{' '}
+            {filterHeading.endDate}
           </h2>
         )}
         <div className="scroll-container">

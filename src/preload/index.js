@@ -10,8 +10,8 @@ contextBridge.exposeInMainWorld('electron', {
     insertRecords: async (readingData) => {
       return ipcRenderer.invoke('insert-records', readingData)
     },
-    insertTanks: async (tankName) => {
-      return ipcRenderer.invoke('insert-tanks', tankName)
+    insertTanks: async (tankName, tankActive) => {
+      return ipcRenderer.invoke('insert-tanks', tankName, tankActive)
     },
     editRecords: async (readingData) => {
       return ipcRenderer.invoke('edit-records', readingData)

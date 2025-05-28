@@ -20,6 +20,7 @@ function App() {
         <Route path="/addRecords/:id" element={<AddRecords />} />
         <Route path="/activateTanks" element={<ActivateTanks />} />
         <Route path="/generateGraphs" element={<GenerateGraphs />} />
+        <Route path="/editTanks" element={<EditTanks />} />
         <Route path="/editTanks/:id" element={<EditTanks />} />
       </Routes>
     </Router>

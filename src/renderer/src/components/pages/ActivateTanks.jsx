@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { FormField } from '../molecules'
+import { useEffect, useState } from 'react'
 import { Button, Input } from '../atoms'
 import { useNavigate } from 'react-router-dom'
 
 export const ActivateTanks = () => {
   const navigate = useNavigate()
   const [tankInfo, setTankInfo] = useState([])
-  const [formData, setFormData] = useState([]) // Track the form data separately
   const [isAdmin, setIsAdmin] = useState(false)
 
   // Fetch tanks and user role
@@ -19,7 +17,7 @@ export const ActivateTanks = () => {
       }
     }
     loadData()
-  }, [])
+  }, []) // Only load data once when component mounts
 
   const fetchUserRole = async () => {
     const role = await window.electron.auth.getRole()
@@ -33,36 +31,44 @@ export const ActivateTanks = () => {
 
   // Handle toggle active checkbox
   const handleToggle = (event, tankId) => {
-    // Find the tank in tankInfo
+    // Update the tank's active status directly in the tankInfo state
     const updatedTankInfo = tankInfo.map((tank) =>
       tank.tank_id === tankId
-        ? { ...tank, tank_active: !tank.tank_active } // Toggle the tank_active status
+        ? { ...tank, tank_active: event.target.checked } // Set tank_active based on checkbox
         : tank
     )
 
-    // Update the tankInfo state with new active/inactive value
     setTankInfo(updatedTankInfo)
-
-    // Update formData to keep track of changes
-    const updatedFormData = updatedTankInfo.map((tank) => ({
+  }
+  const handleActivation = async () => {
+    const updatedFormData = tankInfo.map((tank) => ({
+      tank_name: tank.tank_name,
       tank_id: tank.tank_id,
       tank_active: tank.tank_active ? 1 : 0
     }))
 
-    setFormData(updatedFormData)
-  }
+    console.log(updatedFormData)
 
-  const handleActivation = async () => {
-    console.log(formData)
-    await window.electron.api.activateTanks(formData)
-    navigate('/addRecords')
-  }
+    // Send the updated data to the backend
+    const result = await window.electron.api.activateTanks(updatedFormData)
 
+    if (result.success) {
+      setTankInfo([...updatedFormData])
+
+      navigate('/addRecords')
+    } else {
+      alert(result.error || 'An error occurred while updating tanks')
+    }
+  }
 
   // Render form data for tanks
   const renderFormData = () => {
     if (tankInfo.length === 0) {
-      return <tr><td colSpan="3">No Tanks Found</td></tr>
+      return (
+        <tr>
+          <td colSpan="3">No Tanks Found</td>
+        </tr>
+      )
     }
 
     return tankInfo.map((tankData) => (
@@ -98,11 +104,10 @@ export const ActivateTanks = () => {
               {isAdmin && <th>Action</th>}
             </tr>
           </thead>
-          <tbody>
-            {renderFormData()}
-          </tbody>
+          <tbody>{renderFormData()}</tbody>
         </table>
       </div>
+      {isAdmin && <Button onClick={() => navigate('/editTanks')}>Insert New Tank</Button>}
       <Button onClick={handleActivation}>Save & Exit</Button>
     </div>
   )

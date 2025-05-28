@@ -2,7 +2,7 @@ import { Button } from '../../atoms'
 
 export const TankTable = ({ tanks, onEdit, onDelete }) => {
   return (
-    <div >
+    <div>
       <table className="tank_table">
         <thead>
           <tr>

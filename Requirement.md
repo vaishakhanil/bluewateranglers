@@ -7,11 +7,9 @@
 
 - 2. Find how much food has been consumed based on the weight difference between the two weight (future)
 
-
-
 ### TODO
+
 1. Create Cloud Backup
 2. Setup Autoupdate -- Partially completed
 3. Clean up UI and code
 4. Documentation
-

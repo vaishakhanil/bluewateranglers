@@ -93,20 +93,23 @@ async function isOnline() {
 
 export async function monitorAndBackup() {
   console.log('Monitoring for backup...')
-  setInterval(async () => {
-    if (wasBackupDoneToday()) {
-      console.log("Backup for today done")
-      return
-    }
+  setInterval(
+    async () => {
+      if (wasBackupDoneToday()) {
+        console.log('Backup for today done')
+        return
+      }
 
-    const online = await isOnline()
-    if (!online) return
+      const online = await isOnline()
+      if (!online) return
 
-    try {
-      const auth = await authorize()
-      await uploadFile(auth)
-    } catch (err) {
-      console.error('Backup failed:', err.message)
-    }
-  }, 5 * 60 * 1000) // every 5 minutes
+      try {
+        const auth = await authorize()
+        await uploadFile(auth)
+      } catch (err) {
+        console.error('Backup failed:', err.message)
+      }
+    },
+    5 * 60 * 1000
+  ) // every 5 minutes
 }

@@ -26,9 +26,17 @@ export const EditTanks = () => {
   }, [id])
 
   const submitTanks = async () => {
-    console.log(formData)
-    await window.electron.api.updateTankInfo(formData)
-    navigate('/activateTanks')
+    const { tank_name, tank_active, tank_id } = formData
+
+    if (id) {
+      // Update existing tank
+      await window.electron.api.updateTankInfo({ tank_name, tank_active, tank_id })
+    } else {
+      // Insert new tank
+      await window.electron.api.insertTanks(tank_name, tank_active)
+    }
+
+    navigate('/addRecords')
   }
 
   const handleChange = (e) => {
