@@ -8,11 +8,10 @@ const basePath = path.join(app.getPath('userData'), 'database')
 
 // Define all paths
 const mainDbPath = path.join(basePath, 'main_database')
-const monthlyBackupPath = path.join(basePath, 'backup_montly')
-const dailyBackupPath = path.join(basePath, 'backup_daily')
+const googleCredsPath = path.join(basePath, 'google_creds_path')
 const dbFilePath = path.join(mainDbPath, 'plantDatabase.sqlite')
 
-;[mainDbPath, monthlyBackupPath, dailyBackupPath].forEach((dir) => {
+;[mainDbPath, googleCredsPath].forEach((dir) => {
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true })
   }

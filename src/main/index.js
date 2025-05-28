@@ -22,6 +22,8 @@ import { exportToExcel } from './generateReport/generateReport'
 
 import { autoUpdater } from 'electron-updater'
 
+import { monitorAndBackup } from './backup/backup'
+
 function setupAutoUpdater(mainWindow) {
   mainWindow.once('ready-to-show', () => {
     setTimeout(() => {
@@ -208,6 +210,9 @@ app.whenReady().then(() => {
 
   // Handle Authentication
   ipcHandleAuth()
+
+  // backup
+  monitorAndBackup()
 
   // Auto Update
   setupAutoUpdater(mainWindow)
