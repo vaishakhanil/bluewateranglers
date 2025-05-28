@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { FormField } from '../molecules'
-import { Button, Labels } from '../atoms'
+import { Button, Dropdown, Labels } from '../atoms'
 import { Select } from '../atoms/Inputs'
 
 const foodOptions = [
@@ -37,12 +37,25 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
 
   const [isAdmin, setIsAdmin] = useState(false)
   const [loader, setLoader] = useState(false)
+  const [activeTanks, setActiveTanks] = useState([])
+  const [allTanks, setAllTanks] = useState([])
 
   // Check if today is Tuesday
   useEffect(() => {
     fetchUserRole()
     const today = new Date().getDay()
     setIsTuesday(today === 2)
+
+    // Fetch all tanks from the DB and filter active tanks
+    const fetchTankNames = async () => {
+      const response = await window.electron.api.getAllTankInfo() // Assuming this function fetches all tanks
+      setAllTanks(response) // Store all tanks initially
+      // Filter only active tanks
+      const active = response.filter((tank) => tank.tank_active === 1)
+      setActiveTanks(active.map((tank) => tank.tank_name)) // Extract only tank names of active tanks
+    }
+
+    fetchTankNames()
   }, [])
 
   const fetchUserRole = async () => {
@@ -63,18 +76,22 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
 
   // Handle form submission
   const handleSubmit = () => {
-    console.log(tankData)
     onSave(tankData)
   }
 
   return (
     <div className="tank-form">
-      <FormField
-        label="TANK NAME"
-        name="tank_name"
-        value={tankData.tank_name}
-        onChange={handleChange}
-      />
+      {/* Replace TANK NAME FormField with Dropdown for active tanks */}
+      <Labels>TANK NAME</Labels>
+      <Select name="tank_name" value={tankData.tank_name} onChange={handleChange}>
+        <option value="">Select Tank</option>
+        {activeTanks.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </Select>
+
       <FormField
         label="FISH TYPE"
         name="fish_type_name"

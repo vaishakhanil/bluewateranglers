@@ -14,7 +14,8 @@ import {
   getAllTankInfo,
   getTankById,
   updateTankInfo,
-  getTotalNumberOfPages
+  getTotalNumberOfPages,
+  activateTanks
 } from './database/CRUD'
 import { ipcHandleAuth } from './auth/auth'
 import { setRole } from './auth/store'
@@ -188,6 +189,11 @@ function handleIPC() {
 
   ipcMain.handle('update-tank-info', async (event, tankData) => {
     const result = updateTankInfo(tankData)
+    return result
+  })
+
+  ipcMain.handle('activate-tanks', async (event, tanks) => {
+    const result = activateTanks(tanks)
     return result
   })
 }

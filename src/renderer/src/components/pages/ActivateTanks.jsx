@@ -6,9 +6,10 @@ import { useNavigate } from 'react-router-dom'
 export const ActivateTanks = () => {
   const navigate = useNavigate()
   const [tankInfo, setTankInfo] = useState([])
-  const [formData, setFormData] = useState([])
+  const [formData, setFormData] = useState([]) // Track the form data separately
   const [isAdmin, setIsAdmin] = useState(false)
 
+  // Fetch tanks and user role
   useEffect(() => {
     const loadData = async () => {
       const data = await window.electron.api.getAllTankInfo()
@@ -25,79 +26,59 @@ export const ActivateTanks = () => {
     if (role === 'admin') setIsAdmin(true)
   }
 
+  // Handle edit click for tank
   const handleEdit = (id) => {
     navigate(`/editTanks/${id}`)
   }
 
+  // Handle toggle active checkbox
+  const handleToggle = (event, tankId) => {
+    // Find the tank in tankInfo
+    const updatedTankInfo = tankInfo.map((tank) =>
+      tank.tank_id === tankId
+        ? { ...tank, tank_active: !tank.tank_active } // Toggle the tank_active status
+        : tank
+    )
+
+    // Update the tankInfo state with new active/inactive value
+    setTankInfo(updatedTankInfo)
+
+    // Update formData to keep track of changes
+    const updatedFormData = updatedTankInfo.map((tank) => ({
+      tank_id: tank.tank_id,
+      tank_active: tank.tank_active ? 1 : 0
+    }))
+
+    setFormData(updatedFormData)
+  }
+
+  const handleActivation = async () => {
+    console.log(formData)
+    await window.electron.api.activateTanks(formData)
+    navigate('/addRecords')
+  }
+
+
+  // Render form data for tanks
   const renderFormData = () => {
     if (tankInfo.length === 0) {
-      return 'No Tanks Found'
-    }
-
-    const handleToggle = (event) => {
-      event.stopPropagation()
-
-      let checkbox
-      if (event.target.type === 'checkbox') {
-        checkbox = event.target
-      } else {
-        checkbox = event.currentTarget.querySelector('input[type="checkbox"]')
-      }
-
-      if (checkbox) {
-        const tankId = checkbox.id
-        const newValue = !checkbox.checked
-
-        // Toggle visually
-        checkbox.checked = newValue
-
-        // Update formData by toggling tank_active
-        setFormData((prevData) => {
-          let updatedData = []
-          let index = -1
-
-          if (prevData.length != 0) {
-            updatedData = [...prevData]
-            index = updatedData.findIndex((item) => item.tank_id === tankId)
-          }
-
-          if (index !== -1) {
-            // Update existing entry
-            updatedData[index] = {
-              ...updatedData[index],
-              tank_active: newValue
-            }
-          } else {
-            // Add new entry
-            updatedData.push({
-              tank_id: tankId,
-              tank_active: newValue
-            })
-          }
-
-          return updatedData
-        })
-
-        console.log(`Tank ${tankId} is now ${JSON.stringify(formData)}`)
-      }
+      return <tr><td colSpan="3">No Tanks Found</td></tr>
     }
 
     return tankInfo.map((tankData) => (
       <tr key={tankData.tank_id}>
         <td>{tankData.tank_name}</td>
-        <td id={tankData.tank_id} onClick={handleToggle}>
+        <td>
           <Input
-            id={tankData.tank_id}
             type="checkbox"
             checked={tankData.tank_active}
-            onChange={handleToggle}
+            onChange={(event) => handleToggle(event, tankData.tank_id)}
           />
         </td>
         {isAdmin && (
           <td>
             <Button variant={'primary'} onClick={() => handleEdit(tankData.tank_id)}>
-              {' '}
-              Edit{' '}
+              Edit
             </Button>
           </td>
         )}
@@ -111,13 +92,18 @@ export const ActivateTanks = () => {
       <div className="render-tanks">
         <table>
           <thead>
-            <th>Tank Name</th>
-            <th>Active</th>
+            <tr>
+              <th>Tank Name</th>
+              <th>Active</th>
+              {isAdmin && <th>Action</th>}
+            </tr>
           </thead>
-          {renderFormData()}
+          <tbody>
+            {renderFormData()}
+          </tbody>
         </table>
       </div>
-      <Button onClick={() => navigate('/addRecords')}>Save & Exit</Button>
+      <Button onClick={handleActivation}>Save & Exit</Button>
     </div>
   )
 }

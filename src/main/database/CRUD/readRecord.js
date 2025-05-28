@@ -199,6 +199,7 @@ export const getTankById = (tankId) => {
     tank: tankInfo
   }
 }
+
 export const getAllTankInfo = () => {
   const AllTanks = db.prepare('SELECT * FROM TANKS').all()
   return AllTanks

@@ -9,7 +9,7 @@ export const EditTanks = () => {
   const [formData, setFormData] = useState({
     tank_id: '',
     tank_name: '',
-    tank_active: false
+    tank_active: 0
   })
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export const EditTanks = () => {
       const fetchTankData = async () => {
         const data = await window.electron.api.getTankById(id)
         if (data) {
-          setFormData(data)
+          setFormData(data.tank)
         }
       }
 
@@ -25,15 +25,17 @@ export const EditTanks = () => {
     }
   }, [id])
 
-  const submitTanks = () => {
-    console.log('Submit tanks')
+  const submitTanks = async () => {
+    console.log(formData)
+    await window.electron.api.updateTankInfo(formData)
+    navigate('/activateTanks')
   }
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? (checked ? 1 : 0) : value
     }))
   }
 
@@ -43,7 +45,7 @@ export const EditTanks = () => {
       <div className="add-tanks-form-container">
         <FormField
           label="Tank Name"
-          name="tankName"
+          name="tank_name"
           value={formData.tank_name}
           onChange={handleChange}
         />

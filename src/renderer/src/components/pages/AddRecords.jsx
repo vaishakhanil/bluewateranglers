@@ -10,6 +10,12 @@ export const AddRecords = () => {
   const { id } = useParams()
   const today = new Date().toLocaleDateString('en-GB') // DD/MM/YYYY
 
+  
+  const [tanks, setTanks] = useState([])
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editIndex, setEditIndex] = useState(null)
+
+
   const [formData, setFormData] = useState({
     header_pressure_in: '',
     pump_1_active: false,
@@ -61,10 +67,6 @@ export const AddRecords = () => {
     }))
   }
 
-  const [tanks, setTanks] = useState([])
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [editIndex, setEditIndex] = useState(null)
-
   const handleAddClick = () => {
     setEditIndex(null)
     setIsFormOpen(true)
@@ -101,6 +103,8 @@ export const AddRecords = () => {
   }
 
   const handleSubmit = async () => {
+
+    formData.tank_snapshots = tanks
     const payload = {
       plant_reading: normalizeValues(formData),
       tanks: tanks.map(normalizeValues)
@@ -109,6 +113,7 @@ export const AddRecords = () => {
     try {
       if (id) {
         payload.plant_reading_id = id
+        console.log(payload)
         const result = await window.electron.api.editRecords(payload)
         navigate('/')
         console.log(result)

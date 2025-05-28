@@ -1,5 +1,5 @@
 import { insertRecords, insertTanks } from './insertRecords'
-import { editRecords, updateTankInfo } from './editRecords'
+import { editRecords, updateTankInfo, activateTanks } from './editRecords'
 import { deleteRecords } from './deleteRecords'
 import {
   getPaginatedReadings,
@@ -21,5 +21,6 @@ export {
   getAllTankInfo,
   getTankById,
   updateTankInfo,
-  getTotalNumberOfPages
+  getTotalNumberOfPages,
+  activateTanks
 }

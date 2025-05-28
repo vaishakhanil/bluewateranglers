@@ -42,6 +42,9 @@ contextBridge.exposeInMainWorld('electron', {
     },
     updateTankInfo: async (tankData) => {
       return ipcRenderer.invoke('update-tank-info', tankData)
+    },
+    activateTanks: async (tanks) => {
+      return ipcRenderer.invoke('activate-tanks', tanks)
     }
   },
   auth: {
