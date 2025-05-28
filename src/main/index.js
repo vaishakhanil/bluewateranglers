@@ -15,7 +15,8 @@ import {
   getTankById,
   updateTankInfo,
   getTotalNumberOfPages,
-  activateTanks
+  activateTanks,
+  getLastWeekData
 } from './database/CRUD'
 import { ipcHandleAuth } from './auth/auth'
 import { setRole } from './auth/store'
@@ -194,6 +195,11 @@ function handleIPC() {
 
   ipcMain.handle('activate-tanks', async (event, tanks) => {
     const result = activateTanks(tanks)
+    return result
+  })
+
+  ipcMain.handle('fetch-last-week-data', async (event, tankId) => {
+    const result = getLastWeekData(tankId)
     return result
   })
 }

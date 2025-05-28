@@ -19,6 +19,7 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
   // State to store form data
   const [tankData, setTankData] = useState({
     tank_name: '',
+    tank_id: '', // Added tank_id for fetching last week data
     fish_type_name: '',
     number_of_fishes: 0,
     flow: false,
@@ -37,8 +38,17 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
 
   const [isAdmin, setIsAdmin] = useState(false)
   const [loader, setLoader] = useState(false)
-  const [activeTanks, setActiveTanks] = useState([])
-  const [allTanks, setAllTanks] = useState([])
+  const [activeTanks, setActiveTanks] = useState([]) // Active tanks for dropdown
+  const [selectedTank, setSelectedTank] = useState('') // To store selected tank id
+
+  // Function to fetch last week's data (e.g., food_size, fish_size)
+  const fetchLastWeekData = async (tankId) => {
+    const response = await window.electron.api.getLastWeekData(tankId) // Adjust API call as needed
+    if (response && response.data) {
+      return response.data // Assume the response returns data like { food_size, fish_size }
+    }
+    return { food_size: '', fish_size: '' } // Default if no data is found
+  }
 
   // Check if today is Tuesday
   useEffect(() => {
@@ -48,16 +58,16 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
 
     // Fetch all tanks from the DB and filter active tanks
     const fetchTankNames = async () => {
-      const response = await window.electron.api.getAllTankInfo() // Assuming this function fetches all tanks
-      setAllTanks(response) // Store all tanks initially
-      // Filter only active tanks
+      const response = await window.electron.api.getAllTankInfo()
+      setActiveTanks(response) // Store all tanks initially
       const active = response.filter((tank) => tank.tank_active === 1)
-      setActiveTanks(active.map((tank) => tank.tank_name)) // Extract only tank names of active tanks
+      setActiveTanks(active.map((tank) => ({ tank_name: tank.tank_name, tank_id: tank.tank_id }))) // Extract only active tanks (including tank_id)
     }
 
     fetchTankNames()
   }, [])
 
+  // Fetch user role
   const fetchUserRole = async () => {
     setLoader(true)
     const role = await window.electron.auth.getRole()
@@ -68,11 +78,39 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
   // Handle form input changes
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target
-    setTankData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }))
+    if (name === 'tank_name') {
+      // Update tank_id and tank_name when a new tank is selected
+      const selectedTank = activeTanks.find((tank) => tank.tank_name === value)
+      setTankData((prev) => ({
+        ...prev,
+        tank_name: value,
+        tank_id: selectedTank ? selectedTank.tank_id : ''
+      }))
+    } else {
+      setTankData((prev) => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }))
+    }
   }
+
+  // Fetch last week's data whenever the selected tank changes (based on tank_id)
+  useEffect(() => {
+    const fetchLastWeekValues = async () => {
+      if (tankData.tank_id) {
+        const lastWeekData = await window.electron.api.getLastWeekData(tankData.tank_id)
+
+        console.log(lastWeekData)
+        setTankData((prevData) => ({
+          ...prevData,
+          food_size: lastWeekData.food_size,
+          fish_size: lastWeekData.fish_size
+        }))
+      }
+    }
+
+    fetchLastWeekValues()
+  }, [tankData.tank_id]) // Triggered when tank_id changes
 
   // Handle form submission
   const handleSubmit = () => {
@@ -81,13 +119,12 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
 
   return (
     <div className="tank-form">
-      {/* Replace TANK NAME FormField with Dropdown for active tanks */}
       <Labels>TANK NAME</Labels>
       <Select name="tank_name" value={tankData.tank_name} onChange={handleChange}>
         <option value="">Select Tank</option>
         {activeTanks.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
+          <option key={opt.tank_id} value={opt.tank_name}>
+            {opt.tank_name}
           </option>
         ))}
       </Select>
@@ -142,7 +179,6 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
         disabled={!isTuesday && !isAdmin}
       />
 
-      {/* Number of Fishes Input */}
       <FormField
         label="NUMBER OF FISHES"
         name="number_of_fishes"

@@ -80,7 +80,7 @@ export const initializeDatabase = () => {
         flow INTEGER DEFAULT 0,
         clean INTEGER DEFAULT 0,
         do_level INTEGER DEFAULT 0,
-        food_size REAL DEFAULT 0.0,
+        food_size TEXT DEFAULT '"0" CRUMB',
         fish_size REAL DEFAULT 0.00,
         diet REAL DEFAULT 0.00,
         diet_type TEXT NOT NULL CHECK (diet_type IN ('L', 'gm')),
@@ -88,6 +88,9 @@ export const initializeDatabase = () => {
         FOREIGN KEY (reading_id) REFERENCES plant_readings(id) ON DELETE CASCADE,
         FOREIGN KEY (tank_id) REFERENCES tanks(tank_id) ON DELETE CASCADE,
         FOREIGN KEY (fish_type_id) REFERENCES fish_types(fish_type_id) ON DELETE SET NULL
+        CHECK (food_size IN (
+          '"0" CRUMB', '"1" CRUMB', '"2" CRUMB', '#1.2 MM', '#1.5 MM', '#2 MM', '#3 MM FLOAT', '#5 MM FLOAT'
+        ))
       );
 
       CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_reading_tank ON tank_snapshots(reading_id, tank_id);

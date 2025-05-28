@@ -204,3 +204,25 @@ export const getAllTankInfo = () => {
   const AllTanks = db.prepare('SELECT * FROM TANKS').all()
   return AllTanks
 }
+
+export const getLastWeekData = (tankId) => {
+  const query = `
+    SELECT ts.food_size, ts.fish_size
+    FROM tank_snapshots ts
+    INNER JOIN plant_readings pr ON ts.reading_id = pr.id
+    WHERE ts.tank_id = ?
+    ORDER BY pr.timestamp DESC
+    LIMIT 1;
+  `
+
+  const result = db.prepare(query).get(tankId) // Execute the query to get the most recent snapshot
+
+  if (result) {
+    return {
+      food_size: result.food_size || '',
+      fish_size: result.fish_size || ''
+    }
+  }
+
+  return { food_size: '', fish_size: '' } // Return default values if no result is found
+}

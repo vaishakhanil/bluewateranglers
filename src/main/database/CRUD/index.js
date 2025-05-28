@@ -7,7 +7,8 @@ import {
   getRecordById,
   getAllTankInfo,
   getTankById,
-  getTotalNumberOfPages
+  getTotalNumberOfPages,
+  getLastWeekData
 } from './readRecord'
 
 export {
@@ -22,5 +23,6 @@ export {
   getTankById,
   updateTankInfo,
   getTotalNumberOfPages,
-  activateTanks
+  activateTanks,
+  getLastWeekData
 }

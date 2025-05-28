@@ -125,7 +125,7 @@ export const exportToExcel = async (plantReadings, startDate, endDate) => {
         flow: flow === 1 ? 'TRUE' : 'FALSE',
         clean: clean === 1 ? 'TRUE' : 'FALSE',
         'Fish Size': Number(fish_size).toFixed(2),
-        'Food Size': Number(food_size).toFixed(1),
+        'Food Size': food_size,
         Diet: Number(diet).toFixed(2),
         ...rest
       }
