@@ -2,6 +2,12 @@ import * as d3 from 'd3'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { Header } from '../organisms/Header/Header'
+import { FormField } from '../molecules/FormField/FormField'
+
+import { Loader } from '../organisms/Loader/Loader'
+import { Button } from '../atoms'
+
 export const GenerateGraphs = () => {
   const navigate = useNavigate()
   const svgRef = useRef()
@@ -11,11 +17,13 @@ export const GenerateGraphs = () => {
   const [fishType, setFishType] = useState('RAINBOW TROUT')
   const [data, setData] = useState([])
   const [weightPerWeek, setweightPerWeek] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const [filterHeading, setFilterHeading] = useState(null)
 
   const fetchData = async () => {
     if (!startDate || !endDate) return
+    setLoading(true)
     try {
       const dates = { start: startDate, end: endDate, orderType: 'ASC' }
       const result = await window.electron.api.getDataUsingDate(dates)
@@ -46,6 +54,7 @@ export const GenerateGraphs = () => {
     } catch (err) {
       console.error('Error fetching data:', err)
     }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -139,39 +148,50 @@ export const GenerateGraphs = () => {
   }
 
   return (
-    <div className="generate-graphs-container">
-      <div className="header-container">
-        <button onClick={() => navigate('/generateReports')}>Back</button>
-      </div>
-
-      <div className="controls">
-        <label>
-          Start Date:{' '}
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-        </label>
-        <label>
-          End Date:{' '}
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-        </label>
-        <label>
-          Fish Type:
-          <input type="text" value={fishType} onChange={(e) => setFishType(e.target.value)} />
-        </label>
-        <button onClick={fetchData}>Draw Graph</button>
-      </div>
-
-      <div>
-        {filterHeading && (
-          <h2>
-            Growth of {filterHeading.fishType} from {filterHeading.startDate} to{' '}
-            {filterHeading.endDate}
-          </h2>
-        )}
-        <div className="scroll-container">
-          <svg ref={svgRef}></svg>
+    <>
+      {loading && <Loader />}
+      <Header displayMenus={false} displayReportMenu={false}>
+        <div className="header-menu">
+          <Button variant={'regular'} onClick={() => navigate('/generateReports')}>
+            BACK TO GENERATE REPORTS
+          </Button>
         </div>
-        <span>Version v1.0.5</span>
+      </Header>
+      <div className="generate-graphs-container">
+        <div className="controls">
+          <FormField
+            label="START DATE"
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <FormField
+            label="END DATE"
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+          <FormField
+            label="FISH TYPE"
+            type="text"
+            value={fishType}
+            onChange={(e) => setFishType(e.target.value)}
+          />
+          <Button onClick={fetchData} variant={"regular"}>Draw Graphs</Button>
+        </div>
+
+        <div>
+          {filterHeading && (
+            <h2 className='text-center'>
+              Growth of {filterHeading.fishType} from {filterHeading.startDate} to{' '}
+              {filterHeading.endDate}
+            </h2>
+          )}
+          <div className="scroll-container">
+            <svg ref={svgRef}></svg>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

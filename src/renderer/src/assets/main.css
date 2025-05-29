@@ -13,6 +13,19 @@ body {
   align-items: center;
 }
 
+.operation-menu--container {
+  margin-bottom: 10px;
+}
+
+.form_title {
+  font-weight: bold;
+}
+
+.form_lables {
+  font-size: 1.5rem;
+  margin: 1rem;
+}
+
 .header-logo-container {
   display: flex;
   justify-content: center;
@@ -62,6 +75,10 @@ body {
 /* .form-field-container {
   margin: 5px;
 } */
+
+.text-center {
+  text-align: center;
+}
 
 .react-tabs__tab-list,
 td,
@@ -188,7 +205,6 @@ td {
 .scroll-container {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid #ccc;
   padding-bottom: 10px;
 }
 

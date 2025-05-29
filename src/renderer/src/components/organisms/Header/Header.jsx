@@ -4,7 +4,7 @@ import logo from '../../../assets/bluewaterlogo.svg'
 import { Button } from '../../atoms'
 import PropTypes from 'prop-types'
 
-export const Header = ({ displayMenus = true, displayReportMenu = false, isAdmin = false }) => {
+export const Header = ({ displayMenus = true, displayReportMenu = false, isAdmin = false, children }) => {
   const navigate = useNavigate()
 
   return (
@@ -38,6 +38,8 @@ export const Header = ({ displayMenus = true, displayReportMenu = false, isAdmin
           </Button>
         </div>
       )}
+
+      {children}
     </div>
   )
 }

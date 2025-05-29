@@ -9,7 +9,7 @@
 
 ### TODO
 
-1. Create Cloud Backup
+1. Create Cloud Backup -- DONE
 2. Setup Autoupdate -- Partially completed
 3. Clean up UI and code
 4. Documentation
