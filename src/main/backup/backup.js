@@ -13,7 +13,7 @@ const SERVICE_ACCOUNT_PATH = path.join(credsPath, 'service_account.json')
 const LAST_BACKUP_PATH = path.join(credsPath, 'last_backup.json')
 
 // Drive Folder name from the link
-const FOLDER_ID = '1lO2J00elDNAM4YhXmzWFDyh41POezHQE'
+const FOLDER_ID = '1OGvDOsITtRDkUl646WnukBtKe4Pn0anK'
 
 function wasBackupDoneToday() {
   try {
