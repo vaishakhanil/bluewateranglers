@@ -13,6 +13,11 @@ body {
   align-items: center;
 }
 
+.tank_settings_table {
+  padding-left: 20px;
+  font-size: 20px;
+}
+
 .operation-menu--container {
   margin-bottom: 10px;
 }

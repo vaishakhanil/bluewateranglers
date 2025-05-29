@@ -5,7 +5,7 @@ const Select = styled.select`
   border: none;
   border-radius: 4px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
   background-color: var(--ba-button-white);
   color: var(--ba-text-black);
 

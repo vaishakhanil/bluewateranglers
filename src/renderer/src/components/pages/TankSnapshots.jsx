@@ -48,7 +48,7 @@ export const TankSnapshotViewer = (data = []) => {
   return (
     <div>
       <div className="tank_settings_table">
-        <h3>TANK</h3>
+        <h3>TANK NAME</h3>
         <Select value={currentTankName} onChange={handleDropdownChange}>
           {tankNames.map((name, idx) => (
             <option key={idx} value={name}>
