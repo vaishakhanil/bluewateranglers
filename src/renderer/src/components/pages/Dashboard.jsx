@@ -23,7 +23,7 @@ export const Dashboard = () => {
   const [year, setYear] = useState(null)
 
   // useEffect(() => {
-    
+
   //   getData()
   // }, [])
 
@@ -35,8 +35,8 @@ export const Dashboard = () => {
   }, [page, totalPages, month, year])
 
   const getTodaysData = async () => {
-    const getTodaysData = await window.electron.api.getTodaysReadings() || null
-    if(getTodaysData) {
+    const getTodaysData = (await window.electron.api.getTodaysReadings()) || null
+    if (getTodaysData) {
       console.log(getTodaysData[0].id)
       setEditRecordId(getTodaysData[0]?.id)
     }
@@ -94,6 +94,14 @@ export const Dashboard = () => {
 
   const handleEdit = (id) => {
     navigate(`/addRecords/${id}`)
+  }
+
+  const handleDelete = async (id) => {
+    console.log(id)
+    const result = await window.electron.api.deleteRecords(id)
+    if (result && result.success) {
+      window.location.reload()
+    }
   }
 
   return (
@@ -193,6 +201,10 @@ export const Dashboard = () => {
                               {' '}
                               Edit{' '}
                             </Button>
+                            <Button variant={'primary'} onClick={() => handleDelete(reading.id)}>
+                              {' '}
+                              Delete{' '}
+                            </Button>
                           </td>
                         )}
                       </tr>
@@ -267,6 +279,10 @@ export const Dashboard = () => {
                             <Button variant={'primary'} onClick={() => handleEdit(reading.id)}>
                               {' '}
                               Edit{' '}
+                            </Button>
+                            <Button variant={'primary'} onClick={() => handleDelete(reading.id)}>
+                              {' '}
+                              Delete{' '}
                             </Button>
                           </td>
                         )}
@@ -354,6 +370,10 @@ export const Dashboard = () => {
                             <Button variant={'primary'} onClick={() => handleEdit(reading.id)}>
                               {' '}
                               Edit{' '}
+                            </Button>
+                            <Button variant={'primary'} onClick={() => handleDelete(reading.id)}>
+                              {' '}
+                              Delete{' '}
                             </Button>
                           </td>
                         )}

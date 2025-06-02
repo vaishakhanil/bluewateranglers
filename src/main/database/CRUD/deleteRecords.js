@@ -2,6 +2,7 @@ import { db } from '../initializeDatabase'
 
 // Function to delete a plant reading and its related tank snapshots
 export const deleteRecords = (plantReadingId) => {
+  console.log(plantReadingId)
   db.prepare('BEGIN TRANSACTION').run()
 
   try {
