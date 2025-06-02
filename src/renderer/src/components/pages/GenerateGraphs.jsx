@@ -177,12 +177,14 @@ export const GenerateGraphs = () => {
             value={fishType}
             onChange={(e) => setFishType(e.target.value)}
           />
-          <Button onClick={fetchData} variant={"regular"}>Draw Graphs</Button>
+          <Button onClick={fetchData} variant={'regular'}>
+            Draw Graphs
+          </Button>
         </div>
 
         <div>
           {filterHeading && (
-            <h2 className='text-center'>
+            <h2 className="text-center">
               Growth of {filterHeading.fishType} from {filterHeading.startDate} to{' '}
               {filterHeading.endDate}
             </h2>

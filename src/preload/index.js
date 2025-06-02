@@ -48,6 +48,9 @@ contextBridge.exposeInMainWorld('electron', {
     },
     getLastWeekData: async (tankId) => {
       return ipcRenderer.invoke('fetch-last-week-data', tankId)
+    },
+    getTodaysReadings: async () => {
+      return ipcRenderer.invoke('get-todays-readings')
     }
   },
   auth: {

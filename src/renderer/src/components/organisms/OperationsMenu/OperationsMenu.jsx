@@ -48,9 +48,9 @@ export const OperationsMenu = ({ SendSearchValueToParent }) => {
   }
   return (
     <div className="operation-menu--container">
-      <h2 className='form_title'>Filter by Date</h2>
+      <h2 className="form_title">Filter by Date</h2>
 
-      <label className='form_lables'>Month</label>
+      <label className="form_lables">Month</label>
       <Dropdown name="month" value={filterDate.month} onChange={handleChange}>
         {monthOptions.map(({ value, label }) => (
           <option key={value} value={value}>

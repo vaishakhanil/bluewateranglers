@@ -4,7 +4,13 @@ import logo from '../../../assets/bluewaterlogo.svg'
 import { Button } from '../../atoms'
 import PropTypes from 'prop-types'
 
-export const Header = ({ displayMenus = true, displayReportMenu = false, isAdmin = false, children }) => {
+export const Header = ({
+  displayMenus = true,
+  displayReportMenu = false,
+  isAdmin = false,
+  recordId = null,
+  children
+}) => {
   const navigate = useNavigate()
 
   return (
@@ -16,8 +22,20 @@ export const Header = ({ displayMenus = true, displayReportMenu = false, isAdmin
 
       {displayMenus && (
         <div className="header-menu">
-          <Button onClick={() => navigate('/addRecords')} variant={'regular'}>
+          <Button onClick={() => navigate(`/addRecords/${recordId || ''}`)} variant={'regular'}>
             ADD / UPDATE DAILY REPORTS
+          </Button>
+
+          <Button
+            onClick={() =>
+              navigate(`/addRecords/${recordId || ''}`, {
+                state: { addTanks: true }
+              })
+            }
+            variant={'regular'}
+          >
+            {' '}
+            ADD TANKS{' '}
           </Button>
 
           {isAdmin && (
@@ -47,5 +65,7 @@ export const Header = ({ displayMenus = true, displayReportMenu = false, isAdmin
 Header.propTypes = {
   displayMenus: PropTypes.bool,
   displayReportMenu: PropTypes.bool,
-  isAdmin: PropTypes.bool
+  isAdmin: PropTypes.bool,
+  recordId: PropTypes.string,
+  children: PropTypes.any
 }

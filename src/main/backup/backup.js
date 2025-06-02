@@ -11,9 +11,7 @@ const credsPath = path.join(basePath, 'google_creds_path')
 const DB_PATH = path.join(mainDbPath, 'plantDatabase.sqlite')
 const SERVICE_ACCOUNT_PATH = path.join(credsPath, 'service_account.json')
 const LAST_BACKUP_PATH = path.join(credsPath, 'last_backup.json')
-
-// Drive Folder name from the link
-const FOLDER_ID = '1OGvDOsITtRDkUl646WnukBtKe4Pn0anK'
+const FOLDER_ID_PATH = path.join(credsPath, 'folder_id.json')
 
 function wasBackupDoneToday() {
   try {
@@ -53,11 +51,16 @@ async function findExistingBackup(drive) {
 }
 
 async function uploadFile(auth) {
-  const drive = google.drive({ version: 'v3', auth })
+  if (!fs.existsSync(FOLDER_ID_PATH)) {
+    throw new Error('FOLDER ID NOT FOUND')
+  }
 
   if (!fs.existsSync(DB_PATH)) {
     throw new Error('Database file does not exist')
   }
+
+  const { FOLDER_ID } = JSON.parse(fs.readFileSync(FOLDER_ID_PATH))
+  const drive = google.drive({ version: 'v3', auth })
 
   const existingBackup = await findExistingBackup(drive)
 
@@ -82,7 +85,6 @@ async function uploadFile(auth) {
 }
 
 async function isOnline() {
-  // Simple online check — you can ping a public URL or use Electron net
   try {
     const res = await fetch('https://www.google.com', { method: 'HEAD', timeout: 3000 })
     return res.ok

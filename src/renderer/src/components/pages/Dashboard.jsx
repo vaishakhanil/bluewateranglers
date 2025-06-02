@@ -17,19 +17,30 @@ export const Dashboard = () => {
   const [totalPages, setTotalPages] = useState(1)
   const [plantReadings, setPlantReadings] = useState([])
   const [snapshots, setSnapshots] = useState([])
+  const [editRecordId, setEditRecordId] = useState(null)
 
   const [month, setMonth] = useState(null)
   const [year, setYear] = useState(null)
 
-  useEffect(() => {
-    fetchUserRole()
-    getData()
-  }, [])
+  // useEffect(() => {
+    
+  //   getData()
+  // }, [])
 
   useEffect(() => {
+    getTodaysData()
+    fetchUserRole()
     getData()
     getTotalPages()
   }, [page, totalPages, month, year])
+
+  const getTodaysData = async () => {
+    const getTodaysData = await window.electron.api.getTodaysReadings() || null
+    if(getTodaysData) {
+      console.log(getTodaysData[0].id)
+      setEditRecordId(getTodaysData[0]?.id)
+    }
+  }
 
   const getTotalPages = async () => {
     const totalPages = await window.electron.api.getTotalNumberOfPages('plant_readings')
@@ -88,7 +99,7 @@ export const Dashboard = () => {
   return (
     <>
       {loader && <Loader />}
-      <Header isAdmin={isAdmin} />
+      <Header isAdmin={isAdmin} recordId={editRecordId} />
 
       {/* 
          RENDER THE DATA

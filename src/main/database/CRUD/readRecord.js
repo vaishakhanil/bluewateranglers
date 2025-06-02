@@ -226,3 +226,58 @@ export const getLastWeekData = (tankId) => {
 
   return { food_size: '', fish_size: '' } // Return default values if no result is found
 }
+
+export const getTodaysReadings = () => {
+  // Format today’s date in YYYY-MM-DD
+  const today = new Date().toISOString().slice(0, 10)
+
+  // Query for today's plant readings
+  const readings = db
+    .prepare(
+      `
+      SELECT * FROM plant_readings
+      WHERE DATE(timestamp) = ?
+      ORDER BY timestamp DESC
+    `
+    )
+    .all(today)
+
+  // Extract reading IDs
+  const readingIds = readings.map((r) => r.id)
+
+  if (readingIds.length === 0) return []
+
+  // Query related tank_snapshots
+  const placeholders = readingIds.map(() => '?').join(',')
+  const snapshots = db
+    .prepare(
+      `
+      SELECT 
+        ts.*, 
+        t.tank_name,
+        ft.fish_type_name
+      FROM tank_snapshots ts
+      LEFT JOIN tanks t ON ts.tank_id = t.tank_id
+      LEFT JOIN fish_types ft ON ts.fish_type_id = ft.fish_type_id
+      WHERE ts.reading_id IN (${placeholders})
+    `
+    )
+    .all(...readingIds)
+
+  // Group snapshots by reading_id
+  const snapshotsByReading = {}
+  snapshots.forEach((snapshot) => {
+    if (!snapshotsByReading[snapshot.reading_id]) {
+      snapshotsByReading[snapshot.reading_id] = []
+    }
+    snapshotsByReading[snapshot.reading_id].push(snapshot)
+  })
+
+  // Attach snapshots to readings
+  const result = readings.map((reading) => ({
+    ...reading,
+    tank_snapshots: snapshotsByReading[reading.id] || []
+  }))
+
+  return result
+}

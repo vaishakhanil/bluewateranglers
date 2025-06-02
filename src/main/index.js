@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -16,7 +16,8 @@ import {
   updateTankInfo,
   getTotalNumberOfPages,
   activateTanks,
-  getLastWeekData
+  getLastWeekData,
+  getTodaysReadings
 } from './database/CRUD'
 import { ipcHandleAuth } from './auth/auth'
 import { setRole } from './auth/store'
@@ -64,9 +65,10 @@ function setupAutoUpdater(mainWindow) {
 }
 
 function createWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width,
+    height,
     show: false,
     title: 'Bluewater Anglers - Data Sheet',
     autoHideMenuBar: true,
@@ -201,7 +203,12 @@ function handleIPC() {
   ipcMain.handle('fetch-last-week-data', async (event, tankId) => {
     const result = getLastWeekData(tankId)
     return result
-  })
+  }) 
+  // getTodaysReadings
+    ipcMain.handle('get-todays-readings', async (event) => {
+    const result = getTodaysReadings()
+    return result
+  }) 
 }
 
 app.whenReady().then(() => {
@@ -224,10 +231,10 @@ app.whenReady().then(() => {
   ipcHandleAuth()
 
   // backup
-  monitorAndBackup()
+  // monitorAndBackup()
 
   // Auto Update
-  setupAutoUpdater(mainWindow)
+  // setupAutoUpdater(mainWindow)
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

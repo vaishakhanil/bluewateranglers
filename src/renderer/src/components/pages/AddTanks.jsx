@@ -16,10 +16,9 @@ const foodOptions = [
 const dietTypes = ['gm', 'L']
 
 export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
-  // State to store form data
   const [tankData, setTankData] = useState({
     tank_name: '',
-    tank_id: '', // Added tank_id for fetching last week data
+    tank_id: '',
     fish_type_name: '',
     number_of_fishes: 0,
     flow: false,
