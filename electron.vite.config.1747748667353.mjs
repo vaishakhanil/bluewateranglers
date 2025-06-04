@@ -10,6 +10,7 @@ var electron_vite_config_default = defineConfig({
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {
+    base: './',
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src')
