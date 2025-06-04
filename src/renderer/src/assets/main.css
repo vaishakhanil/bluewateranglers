@@ -220,6 +220,37 @@ td {
   z-index: 1000;
 }
 
+.doc-container {
+  overflow-x: hidden;
+}
+
+.doc-template-container {
+  margin: 2vw;
+}
+
+.doc-template-container {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: bold;
+}
+
+.doc-template-container h1 {
+  font-size: 2em;
+}
+
+.doc-template-container h2 {
+  font-size: 1.75em;
+}
+
+.doc-template-container p {
+  margin: 1em 0;
+}
+
+.doc-template-container img {
+  width: 60vw;
+}
+
 /* MEDIUM SCREENS */
 @media (max-width: 1200px) {
   tr {

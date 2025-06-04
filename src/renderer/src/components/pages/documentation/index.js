@@ -1,5 +1,4 @@
-import { IntroDocsPage } from "./IntroPage";
+import { IntroDocsPage } from './IntroPage'
+import { DocumentationTemplate } from './DocTemplate'
 
-export {
-    IntroDocsPage
-}
+export { IntroDocsPage, DocumentationTemplate }

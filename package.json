@@ -1,6 +1,6 @@
 {
   "name": "bluewateranglers",
-  "version": "v2.0.5",
+  "version": "v2.0.6",
   "description": "Bluewater Anglers Fish Management",
   "main": "./out/main/index.js",
   "author": "Research & Innovation Lab",
@@ -31,8 +31,10 @@
     "moment": "^2.30.1",
     "pdf-lib": "^1.17.1",
     "prop-types": "^15.8.1",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^7.6.0",
     "react-tabs": "^6.1.0",
+    "rehype-highlight": "^7.0.2",
     "styled-components": "^6.1.18",
     "winston": "^3.17.0",
     "xlsx": "^0.18.5"

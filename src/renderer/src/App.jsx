@@ -8,7 +8,8 @@ import {
   GenerateGraphs,
   EditTanks
 } from './components/pages'
-import { IntroDocsPage } from './components/pages/documentation'
+import { IntroDocsPage, DocumentationTemplate } from './components/pages/documentation'
+import { docs } from './components/pages/documentation/markdown'
 
 function App() {
   return (
@@ -25,6 +26,15 @@ function App() {
         <Route path="/editTanks/:id" element={<EditTanks />} />
 
         <Route path="/documentation" element={<IntroDocsPage />} />
+
+        {/* Dynamically generate slugs for docs */}
+        {Object.entries(docs).map(([slug, doc]) => (
+          <Route
+            key={slug}
+            path={`/docs/${slug}`}
+            element={<DocumentationTemplate content={doc.content} />}
+          />
+        ))}
       </Routes>
     </Router>
   )
