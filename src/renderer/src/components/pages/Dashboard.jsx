@@ -398,7 +398,7 @@ export const Dashboard = () => {
           ) : (
             <Button onClick={() => navigate('/login')}>Login as Admin</Button>
           )}
-          <Button variant={'primary'}>Help</Button>
+          <Button onClick={() => navigate('/documentation')} variant={'primary'}>Help</Button>
 
           <div className="pagination">
             <Button onClick={handlePrev} disabled={page === 1}>

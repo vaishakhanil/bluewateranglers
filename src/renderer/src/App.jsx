@@ -8,6 +8,7 @@ import {
   GenerateGraphs,
   EditTanks
 } from './components/pages'
+import { IntroDocsPage } from './components/pages/documentation'
 
 function App() {
   return (
@@ -22,6 +23,8 @@ function App() {
         <Route path="/generateGraphs" element={<GenerateGraphs />} />
         <Route path="/editTanks" element={<EditTanks />} />
         <Route path="/editTanks/:id" element={<EditTanks />} />
+
+        <Route path="/documentation" element={<IntroDocsPage />} />
       </Routes>
     </Router>
   )
