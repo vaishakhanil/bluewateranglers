@@ -57,7 +57,7 @@ export const Header = ({
         </div>
       )}
 
-      {children}
+      {children && <div className="header-menu">{children}</div>}
     </div>
   )
 }

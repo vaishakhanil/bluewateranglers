@@ -21,12 +21,7 @@ export const Dashboard = () => {
 
   const [month, setMonth] = useState(null)
   const [year, setYear] = useState(null)
-
-  // useEffect(() => {
-
-  //   getData()
-  // }, [])
-
+  
   useEffect(() => {
     getTodaysData()
     fetchUserRole()
@@ -37,7 +32,6 @@ export const Dashboard = () => {
   const getTodaysData = async () => {
     const getTodaysData = (await window.electron.api.getTodaysReadings()) || null
     if (getTodaysData) {
-      console.log(getTodaysData[0].id)
       setEditRecordId(getTodaysData[0]?.id)
     }
   }
@@ -144,7 +138,7 @@ export const Dashboard = () => {
                 <tbody>
                   {plantReadings.length == 0 ? (
                     <tr>
-                      <h1>No Data Available</h1>
+                      <td>No Data Available</td>
                     </tr>
                   ) : (
                     plantReadings.map((reading) => (

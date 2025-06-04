@@ -5,7 +5,8 @@ const Input = styled.input`
   border: none;
   border-radius: 4px;
   font-weight: 600;
-  font-size: 14px;
+  margin: 10px 0;
+  font-size: 18px;
   background-color: var(--ba-button-white);
   color: var(--ba-text-black);
 

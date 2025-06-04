@@ -17,7 +17,8 @@ import {
   getTotalNumberOfPages,
   activateTanks,
   getLastWeekData,
-  getTodaysReadings
+  getTodaysReadings,
+  getFirstRecordYear
 } from './database/CRUD'
 import { ipcHandleAuth } from './auth/auth'
 import { setRole } from './auth/store'
@@ -172,6 +173,12 @@ function handleIPC() {
     let orderType = 'DESC'
     if (dates.orderType) orderType = dates.orderType
     const result = await getDataUsingDate(start, end, orderType)
+    return result
+  })
+
+  // Get first record year
+  ipcMain.handle('get-first-record-year', async (event) => {
+    const result = await getFirstRecordYear()
     return result
   })
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Dropdown } from '../../atoms'
 import PropTypes from 'prop-types'
 
@@ -8,7 +8,19 @@ export const OperationsMenu = ({ SendSearchValueToParent }) => {
     year: ''
   }
 
+  const [oldestYear, setOldestYear] = useState(2020)
   const [filterDate, setFilterDate] = useState(initialFilter)
+
+  useEffect(() => {
+    fetchYeardata()
+  },[])
+
+  const fetchYeardata = async () => {
+     const result = await window.electron.api.getFirstRecordYear()
+     const year =  new Date(result).getFullYear()
+     setOldestYear(year)
+  }
+
 
   const handleChange = (e) => {
     const { name, value } = e.target

@@ -99,7 +99,6 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
       if (tankData.tank_id) {
         const lastWeekData = await window.electron.api.getLastWeekData(tankData.tank_id)
 
-        console.log(lastWeekData)
         setTankData((prevData) => ({
           ...prevData,
           food_size: lastWeekData.food_size,

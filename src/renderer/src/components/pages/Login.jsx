@@ -12,7 +12,6 @@ export const LoginPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    console.log(name, value)
     if (name === 'username') {
       setUsername(value)
     } else if (name === 'password') {

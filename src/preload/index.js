@@ -54,7 +54,10 @@ contextBridge.exposeInMainWorld('electron', {
     },
     saveGraphs: async (fileType, data) => {
       return ipcRenderer.invoke('save-graphs', fileType, data)
-    }
+    },
+    getFirstRecordYear: async () => {
+      return ipcRenderer.invoke('get-first-record-year')
+    },
   },
   auth: {
     login: (password) => {

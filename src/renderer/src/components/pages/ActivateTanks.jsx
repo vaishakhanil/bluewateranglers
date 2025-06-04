@@ -47,8 +47,6 @@ export const ActivateTanks = () => {
       tank_active: tank.tank_active ? 1 : 0
     }))
 
-    console.log(updatedFormData)
-
     // Send the updated data to the backend
     const result = await window.electron.api.activateTanks(updatedFormData)
 

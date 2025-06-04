@@ -16,7 +16,6 @@ export const TankSnapshotViewer = (data = []) => {
         unique.set(name, snap.tank_name)
       }
     })
-    console.log(snapshotArray)
     return Array.from(unique.values())
   }, [])
 

@@ -12,6 +12,7 @@ export const getTotalNumberOfPages = (tableName) => {
 
   return result.count
 }
+
 export const getPaginatedReadings = (page = 1, month = null, year = null, pageSize = 5) => {
   const offset = (page - 1) * pageSize
 
@@ -280,4 +281,17 @@ export const getTodaysReadings = () => {
   }))
 
   return result
+}
+
+export const getFirstRecordYear = () => {
+  const query = `
+    SELECT timestamp 
+    FROM plant_readings 
+    ORDER BY timestamp ASC 
+    LIMIT 1
+  `
+
+  const result = db.prepare(query).get()
+
+  return result ? result.timestamp : null
 }

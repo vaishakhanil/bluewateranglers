@@ -1,12 +1,16 @@
 import { useNavigate } from 'react-router-dom'
-import {Button} from '../../atoms'
+import { Button } from '../../atoms'
+import { Header } from '../../organisms'
 
 export const IntroDocsPage = () => {
-    const navigate = useNavigate()
-    return (
-        <div>
-            <h1>This is Documentation Test</h1>
-            <Button varient={"primary"} onClick={() => navigate('/')}>Back</Button>
-        </div>
-    )
+  const navigate = useNavigate()
+  return (
+    <>
+      <Header displayMenus={false}>
+        <Button variant={'regular'} onClick={() => navigate('/')}>
+          BACK TO DASHBOARD
+        </Button>
+      </Header>
+    </>
+  )
 }
