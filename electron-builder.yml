@@ -47,6 +47,6 @@ publish:
   provider: github
   owner: vaishakhanil
   repo: bluewateranglers
-  releaseType: release
+  # releaseType: release
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/

@@ -109,9 +109,8 @@ export const TankForm = ({ initialData = {}, onSave, onCancel }) => {
     }
 
     fetchLastWeekValues()
-  }, [tankData.tank_id]) // Triggered when tank_id changes
+  }, [tankData.tank_id])
 
-  // Handle form submission
   const handleSubmit = () => {
     onSave(tankData)
   }

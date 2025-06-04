@@ -22,16 +22,17 @@ import {
 import { ipcHandleAuth } from './auth/auth'
 import { setRole } from './auth/store'
 import { exportToExcel } from './generateReport/generateReport'
+import { saveGraphs } from './saveGraphs/saveGraphs'
 
 import { autoUpdater } from 'electron-updater'
 
 import { monitorAndBackup } from './backup/backup'
 
 function setupAutoUpdater(mainWindow) {
+  autoUpdater.autoDownload = true
+
   mainWindow.once('ready-to-show', () => {
-    setTimeout(() => {
-      autoUpdater.checkForUpdatesAndNotify()
-    }, 1000)
+    autoUpdater.checkForUpdatesAndNotify()
   })
 
   autoUpdater.on('checking-for-update', () => {
@@ -40,17 +41,17 @@ function setupAutoUpdater(mainWindow) {
 
   autoUpdater.on('update-available', (info) => {
     console.log('Update available:', info)
-    mainWindow.webContents.send('update_available')
+    mainWindow.webContents.send('update_available', info)
   })
 
   autoUpdater.on('update-not-available', (info) => {
-    console.log('Update not available:', info)
-    mainWindow.webContents.send('update_not_available')
+    console.log('No update available:', info)
+    mainWindow.webContents.send('update_not_available', info)
   })
 
   autoUpdater.on('error', (err) => {
     console.error('Error in auto-updater:', err)
-    mainWindow.webContents.send('update_error', err)
+    mainWindow.webContents.send('update_error', err.message)
   })
 
   autoUpdater.on('download-progress', (progressObj) => {
@@ -59,8 +60,8 @@ function setupAutoUpdater(mainWindow) {
 
   autoUpdater.on('update-downloaded', () => {
     mainWindow.webContents.send('update_downloaded')
-    // Optionally restart automatically:
-    // autoUpdater.quitAndInstall();
+    // Uncomment to auto-install after download
+    autoUpdater.quitAndInstall()
   })
 }
 
@@ -209,6 +210,12 @@ function handleIPC() {
     const result = getTodaysReadings()
     return result
   }) 
+
+  // Save Graphs
+  ipcMain.handle('save-graphs', async (event, fileType = null, data = null) => {
+    const result = await saveGraphs(fileType, data)
+    return result
+  })
 }
 
 app.whenReady().then(() => {
@@ -231,10 +238,10 @@ app.whenReady().then(() => {
   ipcHandleAuth()
 
   // backup
-  // monitorAndBackup()
+  monitorAndBackup()
 
   // Auto Update
-  // setupAutoUpdater(mainWindow)
+  setupAutoUpdater(mainWindow)
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

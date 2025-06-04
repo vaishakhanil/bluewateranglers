@@ -51,6 +51,9 @@ contextBridge.exposeInMainWorld('electron', {
     },
     getTodaysReadings: async () => {
       return ipcRenderer.invoke('get-todays-readings')
+    },
+    saveGraphs: async (fileType, data) => {
+      return ipcRenderer.invoke('save-graphs', fileType, data)
     }
   },
   auth: {
