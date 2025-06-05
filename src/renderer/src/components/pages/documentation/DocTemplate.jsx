@@ -11,7 +11,7 @@ import { imageMap } from '../../../assets/docs'
 const resolveImagePlaceholders = (content) => {
   return content.replace(/\{\{img:(.+?)\}\}/g, (_, key) => {
     const src = imageMap[key.trim()]
-    return src ? `![${key}](${src})` : ''
+    return src ? `![${src}](${src})` : ''
   })
 }
 

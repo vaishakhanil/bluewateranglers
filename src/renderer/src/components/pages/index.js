@@ -5,6 +5,8 @@ import { AddRecords } from './AddRecords'
 import { ActivateTanks } from './ActivateTanks'
 import { GenerateGraphs } from './GenerateGraphs'
 import { EditTanks } from './EditTanks'
+import { GenerateAverageFoodWeight } from './GenerateAverageFoodWeight'
+
 
 export {
   LoginPage,
@@ -13,5 +15,6 @@ export {
   AddRecords,
   ActivateTanks,
   GenerateGraphs,
-  EditTanks
+  EditTanks,
+  GenerateAverageFoodWeight
 }

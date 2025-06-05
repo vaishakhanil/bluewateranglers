@@ -1,35 +1,23 @@
-const { dialog, BrowserWindow } = require('electron')
+import path from 'path'
+const { dialog } = require('electron')
 const fs = require('fs')
 
 export const saveGraphs = async (fileType, data) => {
-  try {
-    // Open a "Save As" dialog
-    const saveFileResult = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), {
-      title: 'Save Graph',
-      defaultPath: `graph.${fileType}`,
-      filters: [
-        { name: 'PNG', extensions: ['png'] },
-        { name: 'PDF', extensions: ['pdf'] }
-      ]
-    })
+  const result = await dialog.showSaveDialog({
+    title: 'Save File',
+    defaultPath: path.join(__dirname, `graph.${fileType}`),
+    filters: [{ name: fileType.toUpperCase(), extensions: [fileType] }]
+  })
 
-    if (saveFileResult.canceled) {
-      return
-    }
+  if (!result.canceled && result.filePath) {
+    const filePath = result.filePath
 
-    // Get the file path selected by the user
-    const filePath = saveFileResult.filePath
-
-    // Handle saving based on file type (PNG or PDF)
     if (fileType === 'png') {
-      const base64Data = data.replace(/^data:image\/png;base64,/, '')
-      fs.writeFileSync(filePath, base64Data, 'base64')
+      const buffer = Buffer.from(data, 'base64') // Decode base64 data to binary
+      fs.writeFileSync(filePath, buffer)
     } else if (fileType === 'pdf') {
-      fs.writeFileSync(filePath, Buffer.from(data))
+      const buffer = Buffer.from(data, 'base64') // Decode base64 data to binary
+      fs.writeFileSync(filePath, buffer)
     }
-
-    console.log(`File saved at: ${filePath}`)
-  } catch (error) {
-    console.error('Error saving file:', error)
   }
 }

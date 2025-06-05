@@ -149,6 +149,7 @@ export const GenerateGraphs = () => {
   }
 
   const saveAsPNG = () => {
+    fetchData()
     const svg = svgRef.current
     const svgData = new XMLSerializer().serializeToString(svg)
     const canvas = document.createElement('canvas')
@@ -167,48 +168,8 @@ export const GenerateGraphs = () => {
 
       const pngUrl = canvas.toDataURL('image/png')
 
-      // Send PNG data to Electron's main process
-      // window.electron.ipcRenderer.invoke('save-file', { fileType: 'png', data: pngUrl })
-      window.electron.api.saveGraphs('png', pngUrl)
-    }
-
-    img.src = url
-  }
-
-  const saveAsPDF = async () => {
-    const svg = svgRef.current
-    const svgData = new XMLSerializer().serializeToString(svg)
-    const canvas = document.createElement('canvas')
-    const svgRect = svg.getBoundingClientRect()
-    canvas.width = svgRect.width
-    canvas.height = svgRect.height
-
-    const ctx = canvas.getContext('2d')
-    const img = new Image()
-    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
-    const url = URL.createObjectURL(svgBlob)
-
-    img.onload = async () => {
-      ctx.drawImage(img, 0, 0)
-      URL.revokeObjectURL(url)
-
-      const imgData = canvas.toDataURL('image/png')
-      const pdfDoc = await PDFDocument.create()
-      const page = pdfDoc.addPage([canvas.width, canvas.height])
-      const pngImage = await pdfDoc.embedPng(imgData)
-
-      page.drawImage(pngImage, {
-        x: 0,
-        y: 0,
-        width: canvas.width,
-        height: canvas.height
-      })
-
-      const pdfBytes = await pdfDoc.save()
-
-      // Send PDF data to Electron's main process
-      // window.electron.ipcRenderer.invoke('save-file', { fileType: 'pdf', data: pdfBytes })
-      window.electron.api.saveGraphs('pdf', pdfBytes)
+      const base64Data = pngUrl.split(',')[1]
+      window.electron.api.saveGraphs('png', base64Data)
     }
 
     img.src = url
@@ -219,6 +180,9 @@ export const GenerateGraphs = () => {
       {loading && <Loader />}
       <Header displayMenus={false} displayReportMenu={false}>
         <div className="header-menu">
+          <Button variant={'regular'} onClick={() => navigate('/averageFoodWeight')}>
+            FOOD WEIGHT CONSUMPTION
+          </Button>
           <Button variant={'regular'} onClick={() => navigate('/generateReports')}>
             BACK TO GENERATE REPORTS
           </Button>
@@ -247,6 +211,7 @@ export const GenerateGraphs = () => {
           <Button onClick={fetchData} variant={'regular'}>
             Draw Graphs
           </Button>
+          <Button onClick={saveAsPNG}>Download PNG</Button>
         </div>
 
         <div>
@@ -259,11 +224,6 @@ export const GenerateGraphs = () => {
           <div className="scroll-container">
             <svg ref={svgRef}></svg>
           </div>
-        </div>
-
-        <div className="download-buttons">
-          <Button onClick={saveAsPNG}>Download PNG</Button>
-          <Button onClick={saveAsPDF}>Download PDF</Button>
         </div>
       </div>
     </>

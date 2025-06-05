@@ -6,7 +6,8 @@ import {
   AddRecords,
   ActivateTanks,
   GenerateGraphs,
-  EditTanks
+  EditTanks,
+  GenerateAverageFoodWeight
 } from './components/pages'
 import { IntroDocsPage, DocumentationTemplate } from './components/pages/documentation'
 import { docs } from './components/pages/documentation/markdown'
@@ -22,6 +23,7 @@ function App() {
         <Route path="/addRecords/:id" element={<AddRecords />} />
         <Route path="/activateTanks" element={<ActivateTanks />} />
         <Route path="/generateGraphs" element={<GenerateGraphs />} />
+        <Route path="/averageFoodWeight" element={<GenerateAverageFoodWeight />} />
         <Route path="/editTanks" element={<EditTanks />} />
         <Route path="/editTanks/:id" element={<EditTanks />} />
 

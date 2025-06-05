@@ -1,5 +1,5 @@
-import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
-import { join } from 'path'
+import { app, shell, BrowserWindow, ipcMain, screen, dialog } from 'electron'
+import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initializeDatabase } from './database/initializeDatabase'
@@ -24,6 +24,7 @@ import { ipcHandleAuth } from './auth/auth'
 import { setRole } from './auth/store'
 import { exportToExcel } from './generateReport/generateReport'
 import { saveGraphs } from './saveGraphs/saveGraphs'
+import fs from 'fs'
 
 import { autoUpdater } from 'electron-updater'
 
@@ -211,17 +212,29 @@ function handleIPC() {
   ipcMain.handle('fetch-last-week-data', async (event, tankId) => {
     const result = getLastWeekData(tankId)
     return result
-  }) 
+  })
   // getTodaysReadings
-    ipcMain.handle('get-todays-readings', async (event) => {
+  ipcMain.handle('get-todays-readings', async (event) => {
     const result = getTodaysReadings()
     return result
-  }) 
+  })
 
   // Save Graphs
-  ipcMain.handle('save-graphs', async (event, fileType = null, data = null) => {
-    const result = await saveGraphs(fileType, data)
-    return result
+  ipcMain.handle('save-graphs', async (event, fileType, base64Data) => {
+    // const result = await saveGraphs(fileType, data)
+    // return result
+
+    const result = await dialog.showSaveDialog({
+      title: 'Save File',
+      defaultPath: path.join(__dirname, `graph.${fileType}`),
+      filters: [{ name: fileType.toUpperCase(), extensions: [fileType] }]
+    })
+
+    if (!result.canceled && result.filePath) {
+      const filePath = result.filePath
+      const buffer = Buffer.from(base64Data, 'base64') // Decode base64 to binary
+      fs.writeFileSync(filePath, buffer)
+    }
   })
 }
 

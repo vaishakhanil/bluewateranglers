@@ -8,6 +8,11 @@ files:
   - '!electron.vite.config.{js,ts,mjs,cjs}'
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  
+  - from: dist/renderer/**/*   # Include the React build output
+  - from: src/renderer/src/assets/docs/**/*  # Include the assets/docs folder
+    to: assets/docs            # Copy assets to 'assets/docs' in the output folder
+  
 asarUnpack:
   - resources/**
 win:

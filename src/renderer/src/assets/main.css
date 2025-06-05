@@ -18,6 +18,11 @@ body {
   font-size: 20px;
 }
 
+.download-buttons {
+  width: 50vw;
+  margin: 20px;
+}
+
 .operation-menu--container {
   margin-bottom: 10px;
 }

@@ -52,12 +52,12 @@ contextBridge.exposeInMainWorld('electron', {
     getTodaysReadings: async () => {
       return ipcRenderer.invoke('get-todays-readings')
     },
-    saveGraphs: async (fileType, data) => {
-      return ipcRenderer.invoke('save-graphs', fileType, data)
+    saveGraphs: async (fileType, base64Data) => {
+      return ipcRenderer.invoke('save-graphs', fileType, base64Data)
     },
     getFirstRecordYear: async () => {
       return ipcRenderer.invoke('get-first-record-year')
-    },
+    }
   },
   auth: {
     login: (password) => {
